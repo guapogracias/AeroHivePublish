@@ -1,6 +1,24 @@
+"use client";
+
+import { motion } from 'motion/react';
+
 export default function ProfoundIsotypeASCII() {
   return (
-    <pre className="text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[#FFFFFF] font-mono whitespace-pre text-center select-none overflow-hidden">
+    <motion.pre
+      className="text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[#FFFFFF] font-mono whitespace-pre text-center select-none overflow-hidden"
+      initial={{
+        opacity: 0,
+        y: -50,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.7,
+        ease: [0.25, 0.1, 0.25, 1],
+      }}
+    >
 {`
                                                                                                     
                                                                                                     
@@ -58,7 +76,7 @@ export default function ProfoundIsotypeASCII() {
                                                                                                     
                                                                                                     
 `}
-    </pre>
+    </motion.pre>
   );
 }
 
