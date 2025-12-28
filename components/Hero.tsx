@@ -3,12 +3,12 @@ import BlurText from './BlurText';
 
 export default function Hero() {
   return (
-    <section className="relative w-full min-h-[calc(100vh-64px)] h-[calc(100vh-64px)] bg-[#000000] overflow-hidden">
+    <section className="relative w-full min-h-[100vh] bg-[#000000] overflow-hidden">
       {/* Container with max-width and padding */}
-      <div className="container-main relative h-full">
+      <div className="container-main relative h-full min-h-[100vh]">
         {/* Mobile: 2-column grid, Desktop: 4-column grid */}
         <div 
-          className="hero-grid relative grid h-full"
+          className="hero-grid relative grid h-full min-h-[100vh]"
         >
           {/* Mobile: 3 vertical dotted lines, Desktop: 5 vertical dotted lines */}
           {/* Left border line */}
@@ -26,8 +26,8 @@ export default function Hero() {
           {/* Right border line */}
           <div className="absolute right-0 top-0 bottom-0 dotted-line" />
           
-          {/* Overlay content - centered vertically, following grid layout */}
-          <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-center h-full relative z-10 px-4 md:px-0">
+          {/* Overlay content - positioned higher on screen */}
+          <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-start min-h-[100vh] relative z-10 pt-16 md:pt-12 pb-8">
             {/* ASCII art logo */}
             <div className="mt-0 opacity-100">
                 <ProfoundIsotypeASCII />

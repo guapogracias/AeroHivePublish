@@ -103,7 +103,6 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
   const currentIntensity = useRef(0);
   const targetRotation = useRef(new THREE.Euler(0, 0, 0));
   const currentRotation = useRef(new THREE.Euler(0, 0, 0));
-  const lastCameraLogTime = useRef(0);
 
   // Camera animation refs
   const defaultCameraPosition = useRef(new THREE.Vector3(3, 2, 5));
@@ -168,7 +167,6 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
 
     const layerData = layerCache.get(focusLayer);
     if (!layerData) {
-      console.warn(`Layer "${focusLayer}" not found`);
       return;
     }
 
@@ -205,7 +203,6 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
       targetCameraPosition.current.set(...cameraConfig.position);
       targetCameraRotation.current.set(...cameraConfig.rotation);
       targetCameraFov.current = cameraConfig.fov;
-      console.log(`📸 Using hardcoded camera for "${focusLayer}"`, cameraConfig);
     } else {
       // Fallback: Calculate target rotation (no camera movement)
       const layerPos = new THREE.Vector3();
@@ -232,21 +229,6 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
   // Animation loop
   useFrame((state, delta) => {
     if (!pivotRef.current) return;
-
-    // Log camera position every second
-    const now = Date.now();
-    if (now - lastCameraLogTime.current > 1000) {
-      const camPos = camera.position;
-      const camRot = camera.rotation;
-      const fov = camera instanceof THREE.PerspectiveCamera ? camera.fov : null;
-      console.log("📷 Camera Position:", {
-        position: [camPos.x, camPos.y, camPos.z],
-        rotation: [camRot.x, camRot.y, camRot.z],
-        fov: fov,
-        focusLayer: focusLayer || "none",
-      });
-      lastCameraLogTime.current = now;
-    }
 
     const { modifiedMaterials, layerName } = highlightState.current;
 
