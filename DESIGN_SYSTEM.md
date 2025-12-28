@@ -1,6 +1,6 @@
-# Profound Careers Design System
+# AeroHive Design System
 
-This document contains the complete design system for the Profound Careers page, including the navigation bar (Header) and footer components. Use this as a reference when porting these components to another project.
+This document contains the complete design system for the AeroHive website, including the navigation bar (Header) and footer components. Use this as a reference when porting these components to another project.
 
 ---
 
@@ -266,8 +266,8 @@ export default function Header() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2 px-4">
               <img
-                src="/profound-logo.svg"
-                alt="Profound"
+                src="/images/logo.svg"
+                alt="AeroHive"
                 className="h-4 w-auto"
               />
             </Link>
@@ -374,8 +374,8 @@ export default function Footer() {
           <div className="px-4">
             <Link href="/" className="inline-block">
               <img
-                src="/profound-isotype.svg"
-                alt="Profound"
+                src="/images/blacklogo.svg"
+                alt="AeroHive"
                 className="h-6 w-auto"
               />
             </Link>
@@ -470,7 +470,7 @@ export default function Footer() {
             </h3>
             <nav className="flex flex-col gap-4">
               <Link
-                href="https://twitter.com/profound"
+                href="https://twitter.com/aerohive"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-body-sm text-[var(--text-secondary)] font-normal hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
@@ -491,7 +491,7 @@ export default function Footer() {
                 Twitter
               </Link>
               <Link
-                href="https://linkedin.com/company/profound"
+                href="https://linkedin.com/company/aerohive"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-body-sm text-[var(--text-secondary)] font-normal hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
@@ -526,7 +526,7 @@ export default function Footer() {
             <div className="col-span-4 flex items-center justify-between px-4">
               {/* Copyright */}
               <div className="text-body-sm font-normal" style={{ color: '#464646' }}>
-                © 2025 Profound
+                © 2025 AeroHive
               </div>
               
               {/* System Status */}
@@ -600,7 +600,7 @@ Copy the button styles from the [Component Utilities](#component-utilities) sect
 
 1. Create `components/Header.tsx`
 2. Copy the Header component code from [Header Component](#header-component)
-3. Update logo path (`/profound-logo.svg`) to match your project
+3. Update logo path (`/images/logo.svg`) to match your project
 4. Update navigation items array to match your routes
 5. Update CTA button links as needed
 
@@ -608,7 +608,7 @@ Copy the button styles from the [Component Utilities](#component-utilities) sect
 
 1. Create `components/Footer.tsx`
 2. Copy the Footer component code from [Footer Component](#footer-component)
-3. Update logo path (`/profound-isotype.svg`) to match your project
+3. Update logo path (`/images/blacklogo.svg`) to match your project
 4. Update all link hrefs to match your routes
 5. Update social media links
 6. Update copyright year and company name
@@ -653,8 +653,8 @@ export default function Layout({ children }) {
 
 ### Logo Files
 
-- `/public/profound-logo.svg` - Full logo for header
-- `/public/profound-isotype.svg` - Isotype/icon for footer
+- `/public/images/logo.svg` - Full logo for header
+- `/public/images/blacklogo.svg` - Isotype/icon for footer
 
 ### Icons
 
