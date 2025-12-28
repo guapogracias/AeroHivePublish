@@ -4,23 +4,26 @@ export default function Footer() {
   return (
     <footer className="relative w-full bg-[var(--bg-black)] border-t border-[var(--divider)]">
       <div className="container-main relative py-12">
-        <div className="flex flex-col items-center justify-center">
-          {/* ASCII Art Logo - Small */}
-          <div className="overflow-hidden mb-1" style={{ height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ transform: 'scale(0.2)', transformOrigin: 'center center' }}>
-              <ProfoundIsotypeASCII />
-            </div>
+        <div className="flex flex-row items-center justify-between px-4">
+          {/* Text Content - Left aligned */}
+          <div className="flex flex-col items-start">
+            {/* Company Name */}
+            <h2 className="text-h3 text-[var(--text-primary)] mb-0.5 leading-tight">
+              AeroHive
+            </h2>
+            
+            {/* Tagline */}
+            <p className="text-body-sm text-[var(--text-secondary)] text-left max-w-[600px] leading-tight">
+              Transforming complex landscapes into confident decisions
+            </p>
           </div>
           
-          {/* Company Name */}
-          <h2 className="text-h3 text-[var(--text-primary)] mb-0.5 leading-tight">
-            AeroHive
-          </h2>
-          
-          {/* Tagline */}
-          <p className="text-body-sm text-[var(--text-secondary)] text-center max-w-[600px] px-4 leading-tight">
-            Transforming complex landscapes into confident decisions
-          </p>
+          {/* ASCII Art Logo - Right aligned */}
+          <div className="overflow-hidden flex items-center justify-end" style={{ height: '100px' }}>
+            <div style={{ transform: 'scale(0.2)', transformOrigin: 'right center' }}>
+              <ProfoundIsotypeASCII animated={false} />
+            </div>
+          </div>
         </div>
       </div>
 

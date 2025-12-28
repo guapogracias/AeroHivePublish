@@ -2,25 +2,11 @@
 
 import { motion } from 'motion/react';
 
-export default function ProfoundIsotypeASCII() {
-  return (
-    <motion.pre
-      className="text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[#FFFFFF] font-mono whitespace-pre text-center select-none overflow-hidden"
-      initial={{
-        opacity: 0,
-        y: -50,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.7,
-        ease: [0.25, 0.1, 0.25, 1],
-      }}
-    >
-{`
-                                                                                                    
+interface ProfoundIsotypeASCIIProps {
+  animated?: boolean;
+}
+
+const ASCII_CONTENT = `
                                                                                                     
                                                                                                     
                                                                                                     
@@ -74,9 +60,36 @@ export default function ProfoundIsotypeASCII() {
                                                                                                     
                                                                                                     
                                                                                                     
-                                                                                                    
-`}
-    </motion.pre>
+`;
+
+export default function ProfoundIsotypeASCII({ animated = true }: ProfoundIsotypeASCIIProps) {
+  const className = "text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[#FFFFFF] font-mono whitespace-pre text-center select-none overflow-hidden";
+  
+  if (animated) {
+    return (
+      <motion.pre
+        className={className}
+        initial={{
+          opacity: 0,
+          y: -50,
+        }}
+        animate={{
+          opacity: 1,
+          y: 0,
+        }}
+        transition={{
+          duration: 0.7,
+          ease: [0.25, 0.1, 0.25, 1],
+        }}
+      >
+        {ASCII_CONTENT}
+      </motion.pre>
+    );
+  }
+
+  return (
+    <pre className={className}>
+      {ASCII_CONTENT}
+    </pre>
   );
 }
-

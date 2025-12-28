@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback, useMemo, useRef } from "react";
 import dynamic from "next/dynamic";
 import SectionBlock from "@/components/SectionBlock";
 import { Section, isComponentSection } from "@/types/sections";
@@ -115,6 +115,10 @@ export default function SystemPage() {
   const [inSectionsView, setInSectionsView] = useState(false);
   // Current section index (0-based, within sections array)
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+  // Grid hover state
+  const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null);
+  const [trailCells, setTrailCells] = useState<Array<{ row: number; col: number; timestamp: number }>>([]);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   // Calculate the current layer to focus on
   const currentLayerName = useMemo(() => {
@@ -126,16 +130,41 @@ export default function SystemPage() {
   }, [currentSectionIndex]);
 
   // Hide footer on this page for full-viewport experience
-  useEffect(() => {
-    const footer = document.querySelector("footer");
-    if (footer) {
-      footer.style.display = "none";
-    }
-    return () => {
+  // Set data attribute immediately to prevent flash on reload
+  useLayoutEffect(() => {
+    // Set body attribute immediately - CSS will hide footer
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-hide-footer', 'true');
+      
+      // Also hide directly as backup
+      const footer = document.querySelector("footer");
       if (footer) {
-        footer.style.display = "";
+        footer.style.display = "none";
+      }
+    }
+    
+    return () => {
+      // Remove attribute on unmount
+      if (typeof document !== 'undefined') {
+        document.body.removeAttribute('data-hide-footer');
+        const footer = document.querySelector("footer");
+        if (footer) {
+          footer.style.display = "";
+        }
       }
     };
+  }, []);
+  
+  // Also run immediately on mount (before React hydrates) via script
+  useEffect(() => {
+    // This runs after mount, but the script tag should handle initial load
+    if (typeof document !== 'undefined') {
+      document.body.setAttribute('data-hide-footer', 'true');
+      const footer = document.querySelector("footer");
+      if (footer) {
+        footer.style.display = "none";
+      }
+    }
   }, []);
 
   // Enter sections view from hero
@@ -165,17 +194,125 @@ export default function SystemPage() {
   const canGoBack = true; // Can always go back (to previous section or hero)
   const canGoNext = currentSectionIndex < sections.length - 1;
 
+  // Grid hover handler
+  const handleGridMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!gridRef.current) return;
+    const rect = gridRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    const gridSize = 40;
+    const col = Math.floor(x / gridSize);
+    const row = Math.floor(y / gridSize);
+    
+    setHoveredCell({ row, col });
+    
+    // Add to trail
+    setTrailCells(prev => {
+      const newTrail = [...prev, { row, col, timestamp: Date.now() }];
+      // Keep only recent trail cells (last 5)
+      return newTrail.slice(-5);
+    });
+  }, []);
+
+  const handleGridMouseLeave = useCallback(() => {
+    setHoveredCell(null);
+  }, []);
+
+  // Clean up old trail cells
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTrailCells(prev => 
+        prev.filter(cell => Date.now() - cell.timestamp < 300)
+      );
+    }, 50);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Get active cells (hovered + trail)
+  const activeCells = useMemo(() => {
+    const cells = new Map<string, { row: number; col: number; opacity: number; isHovered: boolean }>();
+    
+    if (hoveredCell) {
+      cells.set(`${hoveredCell.row}-${hoveredCell.col}`, {
+        ...hoveredCell,
+        opacity: 1,
+        isHovered: true,
+      });
+    }
+    
+    trailCells.forEach(trail => {
+      const key = `${trail.row}-${trail.col}`;
+      if (!cells.has(key)) {
+        const trailAge = Date.now() - trail.timestamp;
+        const opacity = Math.max(0, 1 - trailAge / 300);
+        if (opacity > 0) {
+          cells.set(key, {
+            row: trail.row,
+            col: trail.col,
+            opacity: opacity * 0.5,
+            isHovered: false,
+          });
+        }
+      }
+    });
+    
+    return Array.from(cells.values());
+  }, [hoveredCell, trailCells]);
+
   return (
-    <div 
-      className="fixed inset-0 top-[64px] overflow-hidden bg-[var(--bg-black)]"
-      style={{
-        backgroundImage: `
-          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-      }}
-    >
+    <>
+      {/* Blocking script to hide footer immediately on page load/reload */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              if (document.body) {
+                document.body.setAttribute('data-hide-footer', 'true');
+                var footer = document.querySelector('footer');
+                if (footer) footer.style.display = 'none';
+              } else {
+                document.addEventListener('DOMContentLoaded', function() {
+                  document.body.setAttribute('data-hide-footer', 'true');
+                  var footer = document.querySelector('footer');
+                  if (footer) footer.style.display = 'none';
+                });
+              }
+            })();
+          `,
+        }}
+      />
+      <div 
+        ref={gridRef}
+        className="fixed inset-0 top-[64px] overflow-hidden bg-[var(--bg-black)]"
+        onMouseMove={handleGridMouseMove}
+        onMouseLeave={handleGridMouseLeave}
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+          `,
+          backgroundSize: '40px 40px',
+        }}
+      >
+      {/* Interactive grid overlay */}
+      <div className="absolute inset-0 pointer-events-none">
+        {activeCells.map((cell) => (
+          <div
+            key={`${cell.row}-${cell.col}`}
+            className="absolute transition-opacity duration-150"
+            style={{
+              left: `${cell.col * 40}px`,
+              top: `${cell.row * 40}px`,
+              width: '40px',
+              height: '40px',
+              backgroundColor: cell.isHovered ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+              opacity: cell.opacity,
+              pointerEvents: 'none',
+            }}
+          />
+        ))}
+      </div>
       {/* Hero Section - shown when not in sections view */}
       {!inSectionsView && (
         <div className="absolute inset-0 flex flex-col items-center justify-center px-8 md:px-16 text-center">
@@ -251,5 +388,6 @@ export default function SystemPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

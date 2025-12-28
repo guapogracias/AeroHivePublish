@@ -177,3 +177,8 @@ body {
   background-size: 1px 12px;
   background-repeat: repeat-y;
 }
+
+/* Hide footer on system page */
+body[data-hide-footer="true"] footer {
+  display: none !important;
+}
