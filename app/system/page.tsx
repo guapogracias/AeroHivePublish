@@ -1,0 +1,239 @@
+"use client";
+
+import { useEffect, useState, useCallback, useMemo } from "react";
+import dynamic from "next/dynamic";
+import SectionBlock from "@/components/SectionBlock";
+import { Section, isComponentSection } from "@/types/sections";
+
+// Dynamic import for the 3D model to avoid SSR issues
+const DroneModel = dynamic(() => import("@/components/DroneModel"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="text-[var(--text-muted)]">Loading model...</div>
+    </div>
+  ),
+});
+
+const sections: Section[] = [
+  // --- Section 01 ---
+  {
+    id: "section-01",
+    type: "content",
+    caption: "Section 01",
+    title: "Natural Language Control",
+    content:
+      "Users can describe missions in any language, and those instructions are converted into drone-ready commands using PX4, ensuring safe and regulation-compliant operation. The system connects user intent directly to flight behavior without manual configuration. This makes complex missions easy to launch and repeat.",
+  },
+  // --- Component 01: Camera ---
+  {
+    id: "component-01",
+    type: "component",
+    caption: "Component 01",
+    title: "Camera System",
+    content: "Insert content here.",
+    layerName: "Camera Folded",
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  // --- Section 02 ---
+  {
+    id: "section-02",
+    type: "content",
+    caption: "Section 02",
+    title: "Coordinated & Scalable Operations",
+    content:
+      "Flight paths are automatically planned to maximize coverage while adapting drone formations to the task. Jetson Nano enables onboard coordination and decision-making, allowing multiple drones to operate together efficiently without overlap. This architecture scales smoothly from small deployments to large-area operations.",
+  },
+  // --- Component 02: LiDAR ---
+  {
+    id: "component-02",
+    type: "component",
+    caption: "Component 02",
+    title: "LiDAR",
+    content: "Insert content here.",
+    layerName: "LiDAR",
+    cameraConfig: {
+      position: [2, 1, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+  // --- Section 03 ---
+  {
+    id: "section-03",
+    type: "content",
+    caption: "Section 03",
+    title: "Camera & Sensing Framework",
+    content:
+      "Using computer vision, the system processes camera data in real time to recognize user-defined objects trained from example images or online datasets. This allows drones to detect and focus on specific targets or features during flight. Recognition improves as more labeled data is added over time.",
+  },
+  // --- Component 03: PX4 ---
+  {
+    id: "component-03",
+    type: "component",
+    caption: "Component 03",
+    title: "PX4",
+    content: "Insert content here.",
+    layerName: "PX4",
+    cameraConfig: {
+      position: [1, 1.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 2,
+    },
+  },
+  // --- Section 04 ---
+  {
+    id: "section-04",
+    type: "content",
+    caption: "Section 04",
+    title: "Autonomous Decision Making",
+    content:
+      "The onboard AI processes environmental data to make real-time decisions during flight. Drones can adapt to changing conditions, avoid obstacles, and optimize their paths without human intervention. This enables truly autonomous operations in dynamic and unpredictable environments.",
+  },
+  // --- Component 04: Jetson ---
+  {
+    id: "component-04",
+    type: "component",
+    caption: "Component 04",
+    title: "Jetson",
+    content: "Insert content here.",
+    layerName: "Jetson",
+    cameraConfig: {
+      position: [0.5, 2, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+];
+
+export default function SystemPage() {
+  // Track if we're in hero or sections view
+  const [inSectionsView, setInSectionsView] = useState(false);
+  // Current section index (0-based, within sections array)
+  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
+
+  // Calculate the current layer to focus on
+  const currentLayerName = useMemo(() => {
+    const section = sections[currentSectionIndex];
+    if (section && isComponentSection(section)) {
+      return section.layerName;
+    }
+    return null; // Content sections return to default view
+  }, [currentSectionIndex]);
+
+  // Hide footer on this page for full-viewport experience
+  useEffect(() => {
+    const footer = document.querySelector("footer");
+    if (footer) {
+      footer.style.display = "none";
+    }
+    return () => {
+      if (footer) {
+        footer.style.display = "";
+      }
+    };
+  }, []);
+
+  // Enter sections view from hero
+  const enterSectionsView = useCallback(() => {
+    setInSectionsView(true);
+    setCurrentSectionIndex(0);
+  }, []);
+
+  // Navigation handlers
+  const goBack = useCallback(() => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionIndex((prev) => prev - 1);
+    } else {
+      // Go back to hero
+      setInSectionsView(false);
+    }
+  }, [currentSectionIndex]);
+
+  const goNext = useCallback(() => {
+    if (currentSectionIndex < sections.length - 1) {
+      setCurrentSectionIndex((prev) => prev + 1);
+    }
+  }, [currentSectionIndex]);
+
+  // Current section data
+  const currentSection = sections[currentSectionIndex];
+  const canGoBack = true; // Can always go back (to previous section or hero)
+  const canGoNext = currentSectionIndex < sections.length - 1;
+
+  return (
+    <div 
+      className="fixed inset-0 top-[64px] overflow-hidden bg-[var(--bg-black)]"
+      style={{
+        backgroundImage: `
+          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+      }}
+    >
+      {/* Hero Section - shown when not in sections view */}
+      {!inSectionsView && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-8 md:px-16 text-center">
+          <p className="text-h3 text-[var(--text-muted)] mb-4">
+            AeroHive
+          </p>
+          <h1 className="text-h1 text-[var(--text-primary)] mb-6 max-w-[600px]">
+            Intelligent Autonomous Flight
+          </h1>
+          <p className="text-body-lg text-[var(--text-secondary)] mb-8 max-w-[600px]">
+            A comprehensive platform for autonomous drone operations powered by
+            AI and natural language processing, enabling seamless mission
+            planning and execution.
+          </p>
+          <button
+            onClick={enterSectionsView}
+            className="btn-primary font-semibold w-fit cursor-pointer"
+          >
+            Explore the system
+          </button>
+        </div>
+      )}
+
+      {/* Sections View - shown when in sections view */}
+      {inSectionsView && (
+        <div className="absolute inset-0">
+          {/* Drone Model - Positioned right and centered (desktop only) */}
+          <div className="hidden md:flex absolute inset-0 items-center justify-center pl-[25%]">
+            <div className="w-[140%] h-[140%] -ml-[20%]">
+              <DroneModel focusLayer={currentLayerName} />
+            </div>
+          </div>
+
+          {/* Title - Fixed above section component */}
+          <h2 className="absolute top-[80px] left-[4%] md:left-[5%] z-10 text-h1 text-[var(--text-primary)]">
+            Our Drone Model
+          </h2>
+
+          {/* Section Block Overlay - Bottom left */}
+          <div className="absolute bottom-[8%] left-[4%] md:left-[5%] z-10 w-[90%] md:w-[35%] max-w-[450px]">
+            <div className="bg-[var(--bg-black)]/80 backdrop-blur-md rounded-lg p-6 md:p-8 border border-[var(--divider)]">
+              <SectionBlock
+                key={currentSection.id}
+                caption={currentSection.caption}
+                title={currentSection.title}
+                content={currentSection.content}
+                onBack={goBack}
+                onNext={goNext}
+                canGoBack={canGoBack}
+                canGoNext={canGoNext}
+              />
+            </div>
+          </div>
+
+          {/* Mobile: Show simple background since no model */}
+          <div className="md:hidden absolute inset-0 bg-[var(--bg-black)]" />
+        </div>
+      )}
+    </div>
+  );
+}

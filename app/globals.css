@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Background Colors */
+  --bg-primary: #0F0F0F;
+  --bg-black: #0F0F0F;
+  --bg-header: rgba(0, 0, 0, 0.7);
+
+  /* Text Colors */
+  --text-primary: #edf2f5;
+  --text-secondary: #9f9f9f;
+  --text-muted: #828282;
+  --text-dark: #222222;
+
+  /* UI Colors */
+  --btn-dark: #333333;
+  --btn-light: #ffffff;
+  --divider: #232323;
+  --border: #232323;
+
+  /* Layout */
+  --container-max: 1088px;
+  --container-padding: 16px;
+  --column-width: 264px;
+
+  /* Typography - Letter Spacing */
+  --tracking-h1: -2.94px;
+  --tracking-h2: -0.3px;
+  --tracking-body-lg: -0.045px;
+  --tracking-body: -0.2px;
+  --radius: 0.625rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: var(--bg-black);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: var(--tracking-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Classes */
+.text-h1 {
+  font-size: 56px;
+  line-height: 64px;
+  letter-spacing: -2.94px;
+  font-weight: 500;
+}
+
+.text-h2 {
+  font-size: 24px;
+  line-height: 32px;
+  letter-spacing: -0.3px;
+  font-weight: 500;
+}
+
+.text-body-lg {
+  font-size: 18px;
+  line-height: 24px;
+  letter-spacing: -0.045px;
+  font-weight: 400;
+}
+
+.text-body {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: -0.2px;
+  font-weight: 400;
+}
+
+.text-body-sm {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: -0.2px;
+  font-weight: 400;
+}
+
+.text-small {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.text-h3 {
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.text-body-md {
+  font-size: 16px;
+  line-height: 26px;
+  letter-spacing: -0.1px;
+  font-weight: 400;
+}
+
+/* Layout Utilities */
+.container-main {
+  max-width: var(--container-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+}
+
+/* Header Grid */
+.header-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .header-grid {
+    grid-template-columns: repeat(4, minmax(0, 264px));
+  }
+}
+
+/* Button Styles */
+.btn-primary {
+  background-color: var(--btn-light);
+  color: var(--text-dark);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  opacity: 0.7;
+}
+
+.btn-secondary {
+  background-color: var(--btn-dark);
+  color: var(--text-primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  opacity: 0.8;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Dotted Line */
+.dotted-line {
+  width: 1px;
+  background-image: linear-gradient(to bottom, #333 33%, rgba(255, 255, 255, 0) 0%);
+  background-position: right;
+  background-size: 1px 12px;
+  background-repeat: repeat-y;
 }
