@@ -202,9 +202,25 @@ export default function SystemPage() {
       {/* Sections View - shown when in sections view */}
       {inSectionsView && (
         <div className="absolute inset-0">
-          {/* Drone Model - Positioned right and centered (desktop only) */}
-          <div className="hidden md:flex absolute inset-0 items-center justify-center pl-[25%]">
-            <div className="w-[140%] h-[140%] -ml-[20%]">
+          {/* Drone Model Container - Full size frame (desktop only) */}
+          <div className="hidden md:block absolute inset-0 w-full h-full">
+            {/* Drone Model - Positioned within frame */}
+            {/* Adjust the style values below to position the model:
+                - top/left/right/bottom: position from edges
+                - transform: fine-tune centering
+                - width/height: scale the model size */}
+            <div 
+              className="absolute"
+              style={{
+                // Position: adjust these to move the model
+                top: '50%',
+                left: '60%',
+                transform: 'translate(-50%, -50%)',
+                // Size: adjust these to scale the model
+                width: '130%',
+                height: '130%',
+              }}
+            >
               <DroneModel focusLayer={currentLayerName} />
             </div>
           </div>
