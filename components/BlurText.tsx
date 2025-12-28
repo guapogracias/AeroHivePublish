@@ -29,7 +29,13 @@ const buildKeyframes = (from: AnimationSnapshot, steps: AnimationSnapshot[]) => 
 
   const keyframes: Record<string, (string | number)[]> = {};
   keys.forEach(k => {
-    keyframes[k] = [from[k as keyof AnimationSnapshot], ...steps.map(s => s[k as keyof AnimationSnapshot])];
+    const fromValue = from[k as keyof AnimationSnapshot];
+    const stepValues = steps.map(s => s[k as keyof AnimationSnapshot]);
+    // Filter out undefined values and ensure type safety
+    const values = [fromValue, ...stepValues].filter((v): v is string | number => v !== undefined);
+    if (values.length > 0) {
+      keyframes[k] = values;
+    }
   });
   return keyframes;
 };
