@@ -32,7 +32,7 @@ const sections: Section[] = [
     caption: "Component 01",
     title: "Camera System",
     content: "Insert content here.",
-    layerName: "Camera Folded",
+    layerName: "camera",
     cameraConfig: {
       position: [1.5, 0.5, 2],
       lookAtOffset: [0, 0, 0],

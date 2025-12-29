@@ -5,6 +5,8 @@ import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 import { Suspense, useEffect, useRef, useMemo } from "react";
 import * as THREE from "three";
 
+const IS_DEV = process.env.NODE_ENV !== "production";
+
 interface DroneModelProps {
   focusLayer?: string | null;
 }
@@ -21,7 +23,7 @@ const HIGHLIGHT_CONFIG = {
   cameraLerpSpeed: 0.02, // Slower for smoother, longer transitions
 };
 
-const LAYER_NAMES = ["Camera Folded", "LiDAR", "PX4", "Jetson"];
+const LAYER_NAMES = ["camera", "LiDAR", "PX4", "Jetson"];
 
 // Hardcoded camera positions for each layer
 const LAYER_CAMERA_POSITIONS: Record<string, {
@@ -29,7 +31,7 @@ const LAYER_CAMERA_POSITIONS: Record<string, {
   rotation: [number, number, number];
   fov: number;
 }> = {
-  "Camera Folded": {
+  "camera": {
     position: [2.054439966956498, 0.40741873602981604, -5.797696645712311],
     rotation: [-3.0714354689432573, 0.33977415909113695, 3.1181769192697133],
     fov: 50,
@@ -46,14 +48,140 @@ const LAYER_CAMERA_POSITIONS: Record<string, {
   },
 };
 
+// For layers where we want a consistent *relative* view (not an absolute camera pose),
+// compute a camera pose from the focused object's position.
+const LAYER_ORBIT_PRESETS: Record<
+  string,
+  { offset: [number, number, number]; fov: number; lookAtOffset?: [number, number, number] }
+> = {
+  // Low, side-on profile view exposing the wiring bay / board area.
+  // If the angle needs tweaking, adjust the offset and refresh.
+  Jetson: { offset: [2.6, 1.2, 0.9], fov: 55, lookAtOffset: [0, 0.05, 0] },
+};
+
 interface LayerData {
   object: THREE.Object3D;
   meshes: THREE.Mesh[];
   originalMaterials: THREE.Material[][];
 }
 
+function restoreAnyHighlightedMeshes(root: THREE.Object3D) {
+  root.traverse((child) => {
+    if (!(child instanceof THREE.Mesh)) return;
+    const prev = (child.userData as any).__aerohivePrevMaterial as
+      | THREE.Material
+      | THREE.Material[]
+      | undefined;
+    if (!prev) return;
+    child.material = prev as any;
+    delete (child.userData as any).__aerohivePrevMaterial;
+  });
+}
+
+function createHighlightMaterial(origMat: THREE.Material): THREE.MeshStandardMaterial {
+  const origAsAny = origMat as any;
+  const sourceOpacity =
+    typeof origAsAny.opacity === "number" ? (origAsAny.opacity as number) : 1;
+  const sourceTransparent =
+    typeof origAsAny.transparent === "boolean" ? (origAsAny.transparent as boolean) : false;
+  const sourceColorWrite =
+    typeof origAsAny.colorWrite === "boolean" ? (origAsAny.colorWrite as boolean) : true;
+
+  const isMarkerInvisible =
+    sourceOpacity <= 0.01 || sourceColorWrite === false || (sourceTransparent && sourceOpacity <= 0.05);
+
+  // Prefer cloning PBR materials (keeps most settings)
+  if (origMat instanceof THREE.MeshStandardMaterial) {
+    const cloned = origMat.clone();
+    cloned.emissive.copy(HIGHLIGHT_CONFIG.emissiveColor);
+    cloned.emissiveIntensity = isMarkerInvisible ? 1.0 : HIGHLIGHT_CONFIG.minIntensity;
+
+    // If the source is intentionally invisible (common for marker meshes),
+    // force a visible overlay so the highlight can be seen.
+    if (isMarkerInvisible) {
+      cloned.transparent = true;
+      cloned.opacity = 0.35;
+      cloned.depthWrite = false;
+      cloned.depthTest = false;
+      cloned.blending = THREE.AdditiveBlending;
+      cloned.side = THREE.DoubleSide;
+      cloned.toneMapped = false;
+      cloned.polygonOffset = true;
+      cloned.polygonOffsetFactor = -1;
+      cloned.polygonOffsetUnits = -1;
+    }
+
+    return cloned;
+  }
+
+  // Fallback: convert other material types (e.g., Phong/Basic) to Standard so emissive works.
+  // Preserve common visual properties where possible.
+  const anyMat = origMat as unknown as {
+    color?: THREE.Color;
+    map?: THREE.Texture;
+    normalMap?: THREE.Texture;
+    roughnessMap?: THREE.Texture;
+    metalnessMap?: THREE.Texture;
+    emissiveMap?: THREE.Texture;
+    aoMap?: THREE.Texture;
+    alphaMap?: THREE.Texture;
+    transparent?: boolean;
+    opacity?: number;
+    side?: THREE.Side;
+    alphaTest?: number;
+    depthWrite?: boolean;
+    depthTest?: boolean;
+    wireframe?: boolean;
+    roughness?: number;
+    metalness?: number;
+    envMapIntensity?: number;
+    aoMapIntensity?: number;
+  };
+
+  const mat = new THREE.MeshStandardMaterial({
+    color: anyMat.color?.clone?.() ?? new THREE.Color(0xffffff),
+    map: anyMat.map ?? null,
+    normalMap: anyMat.normalMap ?? null,
+    roughnessMap: anyMat.roughnessMap ?? null,
+    metalnessMap: anyMat.metalnessMap ?? null,
+    emissiveMap: anyMat.emissiveMap ?? null,
+    aoMap: anyMat.aoMap ?? null,
+    alphaMap: anyMat.alphaMap ?? null,
+    transparent: anyMat.transparent ?? false,
+    opacity: anyMat.opacity ?? 1,
+    side: anyMat.side ?? THREE.FrontSide,
+    alphaTest: anyMat.alphaTest ?? 0,
+    depthWrite: anyMat.depthWrite ?? true,
+    depthTest: anyMat.depthTest ?? true,
+    wireframe: anyMat.wireframe ?? false,
+    roughness: typeof anyMat.roughness === "number" ? anyMat.roughness : 1,
+    metalness: typeof anyMat.metalness === "number" ? anyMat.metalness : 0,
+    envMapIntensity: typeof anyMat.envMapIntensity === "number" ? anyMat.envMapIntensity : 1,
+    aoMapIntensity: typeof anyMat.aoMapIntensity === "number" ? anyMat.aoMapIntensity : 1,
+  });
+
+  // If the source material is intentionally invisible (common for marker meshes),
+  // force a visible overlay so the highlight can be seen.
+  if (isMarkerInvisible) {
+    mat.transparent = true;
+    mat.opacity = 0.35;
+    mat.depthWrite = false;
+    mat.depthTest = false;
+    mat.blending = THREE.AdditiveBlending;
+    mat.side = THREE.DoubleSide;
+    mat.toneMapped = false;
+    mat.polygonOffset = true;
+    mat.polygonOffsetFactor = -1;
+    mat.polygonOffsetUnits = -1;
+  }
+
+  mat.emissive.copy(HIGHLIGHT_CONFIG.emissiveColor);
+  mat.emissiveIntensity = isMarkerInvisible ? 1.0 : HIGHLIGHT_CONFIG.minIntensity;
+  return mat;
+}
+
 function Model({ focusLayer }: { focusLayer?: string | null }) {
-  const { scene } = useGLTF("/models/Blender2-optimized.glb", true);
+  const { scene } = useGLTF("/models/Blend2.2-optimized.glb", true);
   const { camera } = useThree();
   const pivotRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
@@ -132,20 +260,9 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
 
   // Handle focus layer changes
   useEffect(() => {
-    // Restore previous layer
-    if (highlightState.current.layerName) {
-      const prevData = layerCache.get(highlightState.current.layerName);
-      if (prevData) {
-        prevData.meshes.forEach((mesh, i) => {
-          const originalMats = prevData.originalMaterials[i];
-          if (originalMats && mesh.material) {
-            mesh.material = Array.isArray(mesh.material)
-              ? originalMats
-              : originalMats[0];
-          }
-        });
-      }
-    }
+    // Restore any previously-highlighted meshes, regardless of which layer they came from.
+    // This prevents "stuck blue" if state ever desyncs.
+    restoreAnyHighlightedMeshes(scene);
 
     // Clear state
     highlightState.current.modifiedMaterials = [];
@@ -167,24 +284,28 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
 
     const layerData = layerCache.get(focusLayer);
     if (!layerData) {
+      console.warn(`[DroneModel] focusLayer not found in GLB: "${focusLayer}"`);
       return;
     }
 
-    // Clone and modify materials
+    // Clone/convert and modify materials
     const modifiedMats: THREE.MeshStandardMaterial[] = [];
     layerData.meshes.forEach((mesh, i) => {
       if (!mesh.material) return;
 
+      // Save the current material so we can always restore it later.
+      // (Avoids relying on layer cache ordering or cloned materials.)
+      if (!(mesh.userData as any).__aerohivePrevMaterial) {
+        (mesh.userData as any).__aerohivePrevMaterial = Array.isArray(mesh.material)
+          ? [...mesh.material]
+          : mesh.material;
+      }
+
       const originalMats = layerData.originalMaterials[i];
       const newMats = originalMats.map((origMat) => {
-        if (origMat instanceof THREE.MeshStandardMaterial) {
-          const cloned = origMat.clone();
-          cloned.emissive.copy(HIGHLIGHT_CONFIG.emissiveColor);
-          cloned.emissiveIntensity = HIGHLIGHT_CONFIG.minIntensity;
-          modifiedMats.push(cloned);
-          return cloned;
-        }
-        return origMat;
+        const highlighted = createHighlightMaterial(origMat);
+        modifiedMats.push(highlighted);
+        return highlighted;
       });
 
       mesh.material = Array.isArray(mesh.material) ? newMats : newMats[0];
@@ -195,6 +316,21 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
       modifiedMaterials: modifiedMats,
     };
 
+    if (
+      process.env.NODE_ENV !== "production" &&
+      (focusLayer === "Jetson" || focusLayer === "PX4")
+    ) {
+      console.info("[DroneModel] highlight applied", {
+        focusLayer,
+        meshes: layerData.meshes.length,
+        modifiedMaterials: modifiedMats.length,
+        meshNames: layerData.meshes.map((m) => m.name || "(unnamed)"),
+        materialTypes: layerData.originalMaterials
+          .flat()
+          .map((m) => (m as any)?.type ?? m.constructor?.name ?? "Unknown"),
+      });
+    }
+
     currentIntensity.current = HIGHLIGHT_CONFIG.minIntensity;
 
     // Use hardcoded camera position if available
@@ -203,6 +339,29 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
       targetCameraPosition.current.set(...cameraConfig.position);
       targetCameraRotation.current.set(...cameraConfig.rotation);
       targetCameraFov.current = cameraConfig.fov;
+    } else if (LAYER_ORBIT_PRESETS[focusLayer]) {
+      // Computed pose relative to the focused object (helps when GLB changes slightly).
+      const preset = LAYER_ORBIT_PRESETS[focusLayer];
+
+      const layerPos = new THREE.Vector3();
+      layerData.object.getWorldPosition(layerPos);
+      layerPos.multiplyScalar(MODEL_SCALE);
+      layerPos.sub(modelCenter);
+      layerPos.add(new THREE.Vector3(ANCHOR_OFFSET_X, 0, 0));
+
+      const lookAt = layerPos.clone();
+      if (preset.lookAtOffset) {
+        lookAt.add(new THREE.Vector3(...preset.lookAtOffset));
+      }
+
+      const desiredPos = lookAt.clone().add(new THREE.Vector3(...preset.offset));
+      targetCameraPosition.current.copy(desiredPos);
+      targetCameraFov.current = preset.fov;
+
+      const tmpCam = new THREE.PerspectiveCamera(50, 1, 0.1, 1000);
+      tmpCam.position.copy(desiredPos);
+      tmpCam.lookAt(lookAt);
+      targetCameraRotation.current.copy(tmpCam.rotation);
     } else {
       // Fallback: Calculate target rotation (no camera movement)
       const layerPos = new THREE.Vector3();
@@ -218,13 +377,30 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
         .subVectors(cameraPos, layerPos)
         .normalize();
 
-      targetRotation.current.set(
-        0,
-        Math.atan2(-direction.x, -direction.z),
-        0
-      );
+      targetRotation.current.set(0, Math.atan2(-direction.x, -direction.z), 0);
     }
   }, [focusLayer, layerCache, modelCenter, camera]);
+
+  // Dev helper: press "P" to print the current camera pose to the console.
+  // Use it to capture a perfect view for hardcoding into LAYER_CAMERA_POSITIONS.
+  useEffect(() => {
+    if (!IS_DEV) return;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "p") return;
+      const isPerspective = camera instanceof THREE.PerspectiveCamera;
+      // eslint-disable-next-line no-console
+      console.log("[DroneModel] camera preset capture", {
+        focusLayer: focusLayer ?? null,
+        position: [camera.position.x, camera.position.y, camera.position.z],
+        rotation: [camera.rotation.x, camera.rotation.y, camera.rotation.z],
+        fov: isPerspective ? camera.fov : null,
+      });
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [camera, focusLayer]);
 
   // Animation loop
   useFrame((state, delta) => {
@@ -307,7 +483,7 @@ export default function DroneModel({ focusLayer }: DroneModelProps) {
           <Model focusLayer={focusLayer} />
           <Environment preset="city" />
           <OrbitControls
-            enableZoom={false}
+            enableZoom={IS_DEV}
             enablePan={false}
             autoRotate={!focusLayer}
             autoRotateSpeed={0.5}
@@ -318,4 +494,4 @@ export default function DroneModel({ focusLayer }: DroneModelProps) {
   );
 }
 
-useGLTF.preload("/models/Blender2-optimized.glb", true);
+useGLTF.preload("/models/Blend2.2-optimized.glb", true);

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "optimize:model:blend2.2": "gltf-transform webp public/models/Blend2.2.glb public/models/Blend2.2-webp.glb --quality 85 && gltf-transform draco public/models/Blend2.2-webp.glb public/models/Blend2.2-optimized.glb --method edgebreaker"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.7",
@@ -21,6 +22,7 @@
     "three": "^0.182.0"
   },
   "devDependencies": {
+    "@gltf-transform/cli": "^4.2.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
