@@ -24,24 +24,24 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
     title: "Spatial Scope",
     description:
       "Define and manage operational boundaries, restricted zones, and geofenced regions that govern where missions may occur.",
-    imageSrc: undefined,
-    imageAlt: "Plan screenshot 1",
+    imageSrc: "/images/platformoverview/spatialscope.png",
+    imageAlt: "Spatial Scope",
   },
   {
     label: "Plan",
     title: "Asset Registry",
     description:
       "Maintain a unified inventory of physical and logical assets with persistent IDs, locations, and historical records.",
-    imageSrc: undefined,
-    imageAlt: "Plan screenshot 2",
+    imageSrc: "/images/platformoverview/assertregistry.png",
+    imageAlt: "Asset Registry",
   },
   {
     label: "Plan",
     title: "Mission Design",
     description:
       "Create reusable mission templates that define coverage patterns, sensor configurations, constraints, and execution rules.",
-    imageSrc: undefined,
-    imageAlt: "Plan screenshot 3",
+    imageSrc: "/images/platformoverview/missiondesign.png",
+    imageAlt: "Mission Design",
   },
   // Analyze (3)
   {
@@ -49,24 +49,24 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
     title: "Temporal Change Analysis",
     description:
       "Detect and quantify differences across time to surface movement, degradation, growth, or progress.",
-    imageSrc: undefined,
-    imageAlt: "Analyze screenshot 1",
+    imageSrc: "/images/platformoverview/temporalchange.png",
+    imageAlt: "Temporal Change Analysis",
   },
   {
     label: "Analyze",
     title: "Condition Intelligence",
     description:
       "Assess the current state, risk level, or integrity of assets and surfaces using derived spatial indicators.",
-    imageSrc: undefined,
-    imageAlt: "Analyze screenshot 2",
+    imageSrc: "/images/platformoverview/conditionintelligence.png",
+    imageAlt: "Condition Intelligence",
   },
   {
     label: "Analyze",
     title: "Operational Context",
     description:
       "Evaluate environmental and situational factors—weather, terrain, access, signal quality—that affect data quality and mission feasibility.",
-    imageSrc: undefined,
-    imageAlt: "Analyze screenshot 3",
+    imageSrc: "/images/platformoverview/operationalcontext.png",
+    imageAlt: "Operational Context",
   },
   // Act (3)
   {
@@ -74,24 +74,24 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
     title: "Action Planning",
     description:
       "Translate analysis into prioritized, location-specific actions such as inspections, maintenance, mitigation, or follow-up scans.",
-    imageSrc: undefined,
-    imageAlt: "Act screenshot 1",
+    imageSrc: "/images/platformoverview/actionplanning.png",
+    imageAlt: "Action Planning",
   },
   {
     label: "Act",
     title: "Execution Management",
     description:
       "Assign tasks, schedule operations, and track completion across teams with evidence and audit trails.",
-    imageSrc: undefined,
-    imageAlt: "Act screenshot 2",
+    imageSrc: "/images/platformoverview/executionmanagement.png",
+    imageAlt: "Execution Management",
   },
   {
     label: "Act",
     title: "Compliance & Reporting",
     description:
       "Generate regulatory, operational, and client-facing documentation including flight logs, audit records, and inspection reports.",
-    imageSrc: undefined,
-    imageAlt: "Act screenshot 3",
+    imageSrc: "/images/platformoverview/compliancereporting.png",
+    imageAlt: "Compliance & Reporting",
   },
 ];
 
@@ -119,8 +119,8 @@ export default function ScrollShowcase({
 
   // Layout constants (px). These ensure cards never look related across categories,
   // and that scaled cards don't get clipped by the viewport.
-  const CARD_GAP_PX = 24; // matches gap-6
-  const GROUP_SIDE_PADDING_PX = 32; // keeps scaled cards from clipping at edges
+  const CARD_GAP_PX = 16; // tighter gaps so cards can be wider (3-up)
+  const GROUP_SIDE_PADDING_PX = 16; // keep cards wide, still avoid edge clipping
   const CATEGORY_TRANSITION_MS = 420;
   const CATEGORY_TRANSITION_PX = 44;
   const CATEGORY_TRANSITION_BLUR_PX = 6;
@@ -237,7 +237,7 @@ export default function ScrollShowcase({
         className="sticky flex items-start"
         style={{ top: HEADER_HEIGHT_PX, height: `calc(100vh - ${HEADER_HEIGHT_PX}px)` }}
       >
-        <div className="container-main max-w-[1400px] w-full py-8 md:py-10">
+        <div className="container-main max-w-[1680px] w-full py-6 md:py-8">
           <div className="flex flex-col h-full">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div className="max-w-[680px]">
@@ -276,8 +276,11 @@ export default function ScrollShowcase({
             <div className="flex-1 flex items-start pt-6 md:pt-8">
               <div
                 ref={frameRef}
-                className="w-full overflow-x-hidden overflow-y-visible"
+                className="w-screen overflow-x-hidden overflow-y-visible"
                 style={{
+                  // Full-bleed row so each card can be significantly wider.
+                  marginLeft: "calc(50% - 50vw)",
+                  marginRight: "calc(50% - 50vw)",
                   paddingLeft: GROUP_SIDE_PADDING_PX,
                   paddingRight: GROUP_SIDE_PADDING_PX,
                   paddingTop: 12,
@@ -308,7 +311,7 @@ export default function ScrollShowcase({
                 return (
                   <div
                     key={`${opts.mode}-group-${gIdx}`}
-                    className="absolute inset-0 flex gap-6"
+                    className="absolute inset-0 flex"
                     style={{
                       width: usableW ? `${usableW}px` : "100%",
                       left: "50%",
@@ -320,6 +323,7 @@ export default function ScrollShowcase({
                       pointerEvents: isPrev ? "none" : "auto",
                     }}
                   >
+                    <div className="flex gap-4 w-full">
                     {group.map((item, withinIdx) => {
                       const isActive =
                         !isPrev &&
@@ -340,14 +344,14 @@ export default function ScrollShowcase({
                             transform: `scale(${isActive ? 1.03 : 0.99})`,
                           }}
                         >
-                          <div className="relative w-full h-[46vh] overflow-hidden rounded-t-xl">
+                          <div className="relative w-full h-[52vh] overflow-hidden rounded-t-xl">
                             {item.imageSrc ? (
                               <Image
                                 src={item.imageSrc}
                                 alt={item.imageAlt ?? item.title}
                                 fill
                                 sizes="(min-width: 1024px) 33vw, 90vw"
-                                className="object-cover"
+                                className="object-contain bg-black/20"
                                 priority={gIdx === 0 && withinIdx === 0}
                               />
                             ) : (
@@ -370,6 +374,7 @@ export default function ScrollShowcase({
                         </div>
                       );
                     })}
+                    </div>
                   </div>
                 );
               };
@@ -383,7 +388,7 @@ export default function ScrollShowcase({
                   }}
                 >
                   {/* Preserve layout height */}
-                  <div className="invisible flex gap-6">
+                  <div className="invisible flex gap-4">
                     {(groups[activeGroupIndex] ?? []).map((_, withinIdx) => (
                       <div
                         key={`sizer-${withinIdx}`}
@@ -391,7 +396,7 @@ export default function ScrollShowcase({
                         style={{ width: cardW ? `${cardW}px` : "33.333%" }}
                       >
                         {/* Match the live card proportions for stable layout height */}
-                        <div className="w-full h-[46vh]" />
+                        <div className="w-full h-[52vh]" />
                         <div className="p-6">
                           <div className="text-[20px] leading-[28px] font-medium">Sizer</div>
                           <div className="text-body mt-3">Sizer line</div>

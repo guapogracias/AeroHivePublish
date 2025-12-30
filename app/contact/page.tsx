@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Team from "@/components/Team";
 
 type TeamContact = {
   name: string;
@@ -35,94 +34,38 @@ export default function ContactPage() {
       {/* Main Contact Section */}
       <section className="relative flex-1 flex items-center border-b border-[var(--divider)]">
         <div className="container-main relative w-full">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 md:py-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 md:py-8">
             {/* Contact section - Mobile: full width, Desktop: spans columns 1-2 */}
             <div className="col-span-2 md:col-span-2 px-4">
-              <h1 className="text-h1 text-[var(--text-primary)] mb-4">
+              <h1 className="text-[40px] leading-[48px] tracking-[-1.8px] md:text-[48px] md:leading-[56px] md:tracking-[-2.2px] font-medium text-[var(--text-primary)] mb-3">
                 Contact Us
               </h1>
-              <p className="text-body-lg text-[var(--text-secondary)] mb-6 max-w-[480px]">
-                Get in touch with our team to schedule a demo or learn more about our solutions.
-              </p>
 
-              {/* Contact Information */}
-              {/* 
-                TO ADD YOUR CONTACT DETAILS:
-                1. Replace the placeholder email below with your actual email address
-                2. Add or remove contact methods as needed (phone, address, etc.)
-                3. Update the href attributes to use mailto:, tel:, or external links
-                4. You can add more contact items by copying the structure below
-              */}
-              <div className="space-y-4">
-                {/* Email - Replace with your email */}
-                <div>
-                  <h3 className="text-h3 text-[var(--text-primary)] mb-1">
-                    Email
-                  </h3>
-                  <a
-                    href="mailto:contact@example.com"
-                    className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    {/* Replace 'contact@example.com' with your actual email */}
-                    contact@example.com
-                  </a>
-                </div>
+              {/* Team description (replaces placeholder email block) */}
+              <div className="mt-6">
+                <p className="text-h2 text-[var(--text-primary)] mb-4">
+                  Aerospace engineers, computer scientists, and business strategists.
+                </p>
+                <p className="text-body-md text-[var(--text-secondary)] mb-5 max-w-[420px]">
+                  Our team combines aerospace engineers who design our modular drone platforms, computer
+                  science engineers who built the swarm autonomy, and business strategy from Michigan Ross.
+                </p>
+                <p className="text-body-md text-[var(--text-primary)] font-medium">
+                  We are AeroHive.
+                </p>
 
-                {/* Phone - Uncomment and add your phone number */}
-                {/* 
-                <div>
-                  <h3 className="text-h3 text-[var(--text-primary)] mb-1">
-                    Phone
-                  </h3>
-                  <a
-                    href="tel:+1234567890"
-                    className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                  >
-                    +1 (234) 567-8900
-                  </a>
+                {/* Team photo (color) */}
+                <div className="mt-5 max-w-[420px]">
+                  <Image
+                    src="/images/image.png"
+                    alt="AeroHive team"
+                    width={900}
+                    height={700}
+                    className="w-full h-auto object-contain rounded-2xl"
+                    style={{ maxHeight: "340px" }}
+                    priority={false}
+                  />
                 </div>
-                */}
-
-                {/* Address - Uncomment and add your address */}
-                {/* 
-                <div>
-                  <h3 className="text-h3 text-[var(--text-primary)] mb-1">
-                    Address
-                  </h3>
-                  <p className="text-body-md text-[var(--text-secondary)]">
-                    123 Main Street<br />
-                    City, State 12345<br />
-                    Country
-                  </p>
-                </div>
-                */}
-
-                {/* Social Links - Uncomment and add your social media links */}
-                {/* 
-                <div>
-                  <h3 className="text-h3 text-[var(--text-primary)] mb-1">
-                    Follow Us
-                  </h3>
-                  <div className="flex gap-4">
-                    <a
-                      href="https://linkedin.com/company/yourcompany"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                    >
-                      LinkedIn
-                    </a>
-                    <a
-                      href="https://twitter.com/yourcompany"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
-                    >
-                      Twitter
-                    </a>
-                  </div>
-                </div>
-                */}
               </div>
             </div>
 
@@ -132,7 +75,7 @@ export default function ContactPage() {
                 Meet the team
               </h2>
 
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
                 {TEAM_CONTACTS.map((person) => (
                   <div
                     key={person.email}
@@ -140,31 +83,31 @@ export default function ContactPage() {
                   >
                     <div className="flex flex-col sm:flex-row">
                       {/* Image (left) */}
-                      <div className="relative w-full sm:w-[160px] h-[180px] sm:h-auto shrink-0">
+                      <div className="relative w-full sm:w-[132px] h-[160px] sm:h-auto shrink-0">
                         <Image
                           src={person.imageSrc}
                           alt={person.name}
                           fill
-                          sizes="(min-width: 640px) 160px, 100vw"
+                          sizes="(min-width: 640px) 132px, 100vw"
                           className="object-cover"
                           priority={false}
                         />
                       </div>
 
                       {/* Content */}
-                      <div className="p-5 sm:p-6 flex flex-col gap-3">
-                        <div className="text-h2 text-[var(--text-primary)]">
+                      <div className="p-4 sm:p-5 flex flex-col gap-2">
+                        <div className="text-[20px] leading-[28px] font-medium text-[var(--text-primary)]">
                           {person.name}
                         </div>
 
-                        <div className="text-body text-[var(--text-secondary)]">
+                        <div className="text-body-sm text-[var(--text-secondary)]">
                           {person.bio}
                         </div>
 
                         <div className="pt-1">
                           <a
                             href={`mailto:${person.email}`}
-                            className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                            className="text-body-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
                           >
                             {person.email}
                           </a>
@@ -178,9 +121,6 @@ export default function ContactPage() {
           </div>
         </div>
       </section>
-
-      {/* Team Section (moved from Overview) */}
-      <Team />
     </main>
   );
 }

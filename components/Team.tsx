@@ -19,7 +19,7 @@ export default function Team() {
                         We are AeroHive.
                     </p>
                 </div>
-                <div className="col-span-2 md:col-span-2 px-4 mt-8 md:mt-0 relative w-full grayscale">
+                <div className="col-span-2 md:col-span-2 px-4 mt-8 md:mt-0 relative w-full">
                     <div className="relative w-full h-auto">
                         <Image 
                             src="/images/image.png" 
