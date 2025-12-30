@@ -18,11 +18,9 @@ export default function CoverageHero() {
             <p className="text-[16px] leading-[22px] tracking-[-0.2px] md:text-[18px] md:leading-[24px] md:tracking-[-0.045px] text-[var(--text-secondary)] text-center max-w-2xl mb-8">
               One platform, endless applications. Discover how our autonomous drone swarms are transforming industries by providing real-time, actionable intelligence.
             </p>
-            <button 
-              className="btn-primary"
-            >
+            <a href="/demo" className="btn-primary font-semibold">
               Get a demo
-            </button>
+            </a>
           </div>
         </div>
       </div>

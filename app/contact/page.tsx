@@ -56,15 +56,17 @@ export default function ContactPage() {
 
                 {/* Team photo (color) */}
                 <div className="mt-5 max-w-[420px]">
-                  <Image
-                    src="/images/image.png"
-                    alt="AeroHive team"
-                    width={900}
-                    height={700}
-                    className="w-full h-auto object-contain rounded-2xl"
-                    style={{ maxHeight: "340px" }}
-                    priority={false}
-                  />
+                  <div className="rounded-2xl border border-[var(--divider)] overflow-hidden bg-black/20">
+                    <Image
+                      src="/images/image.png"
+                      alt="AeroHive team"
+                      width={900}
+                      height={700}
+                      className="block w-full h-auto object-contain"
+                      style={{ maxHeight: "340px" }}
+                      priority={false}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

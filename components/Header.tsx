@@ -9,7 +9,7 @@ import { useState } from "react";
 const navItems = [
   { label: "Overview", href: "/" },
   { label: "System", href: "/system" },
-  { label: "Coverage", href: "/coverage" },
+  { label: "Application", href: "/coverage" },
   { label: "Contact", href: "/contact" },
 ];
 
@@ -37,7 +37,7 @@ export default function Header() {
 
           {/* Mobile: Right side actions - Column 2 */}
           <div className="flex items-center justify-end gap-4 px-4 md:hidden">
-            <Link href="/contact" className="btn-primary font-semibold">
+            <Link href="/demo" className="btn-primary font-semibold">
               Get a Demo
             </Link>
             <button 
@@ -71,7 +71,7 @@ export default function Header() {
 
           {/* Desktop: Right side actions - Column 4 */}
           <div className="hidden md:flex items-center justify-end gap-4 px-4">
-            <Link href="/contact" className="btn-primary font-semibold">
+            <Link href="/demo" className="btn-primary font-semibold">
               Get a Demo
             </Link>
           </div>
