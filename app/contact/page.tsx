@@ -1,3 +1,34 @@
+import Image from "next/image";
+import Team from "@/components/Team";
+
+type TeamContact = {
+  name: string;
+  bio: string;
+  email: string;
+  imageSrc: string;
+};
+
+const TEAM_CONTACTS: TeamContact[] = [
+  {
+    name: "Oscar de Castro",
+    bio: "Add a short bio here. Replace this placeholder with role, focus areas, and how to reach out.",
+    email: "odcastro@umich.edu",
+    imageSrc: "/images/headshots/Oscar.png",
+  },
+  {
+    name: "Jina Patel",
+    bio: "Add a short bio here. Replace this placeholder with role, focus areas, and how to reach out.",
+    email: "pjina@umich.edu",
+    imageSrc: "/images/headshots/Jina.png",
+  },
+  {
+    name: "Sam Hartt",
+    bio: "Add a short bio here. Replace this placeholder with role, focus areas, and how to reach out.",
+    email: "samhartt@umich.edu",
+    imageSrc: "/images/headshots/Sam.png",
+  },
+];
+
 export default function ContactPage() {
   return (
     <main className="flex flex-col min-h-[calc(100vh-64px)] bg-[var(--bg-black)]">
@@ -98,18 +129,58 @@ export default function ContactPage() {
             {/* Right side - Desktop: spans columns 3-4 */}
             <div className="col-span-2 md:col-span-2 px-4 mt-8 md:mt-0">
               <h2 className="text-h2 text-[var(--text-primary)] mb-4">
-                Let's Start a Conversation
+                Meet the team
               </h2>
-              <p className="text-body-md text-[var(--text-secondary)] mb-4 max-w-[400px]">
-                Whether you're interested in exploring our autonomous drone solutions, scheduling a demonstration, or discussing how we can help solve your specific challenges, we're here to help.
-              </p>
-              <p className="text-body-md text-[var(--text-secondary)] max-w-[400px]">
-                Our team is ready to answer your questions and provide detailed information about our technology, deployment options, and integration capabilities.
-              </p>
+
+              <div className="flex flex-col gap-4">
+                {TEAM_CONTACTS.map((person) => (
+                  <div
+                    key={person.email}
+                    className="w-full rounded-xl border border-[var(--divider)] bg-white/5 overflow-hidden"
+                  >
+                    <div className="flex flex-col sm:flex-row">
+                      {/* Image (left) */}
+                      <div className="relative w-full sm:w-[160px] h-[180px] sm:h-auto shrink-0">
+                        <Image
+                          src={person.imageSrc}
+                          alt={person.name}
+                          fill
+                          sizes="(min-width: 640px) 160px, 100vw"
+                          className="object-cover"
+                          priority={false}
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="p-5 sm:p-6 flex flex-col gap-3">
+                        <div className="text-h2 text-[var(--text-primary)]">
+                          {person.name}
+                        </div>
+
+                        <div className="text-body text-[var(--text-secondary)]">
+                          {person.bio}
+                        </div>
+
+                        <div className="pt-1">
+                          <a
+                            href={`mailto:${person.email}`}
+                            className="text-body-md text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                          >
+                            {person.email}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Team Section (moved from Overview) */}
+      <Team />
     </main>
   );
 }
