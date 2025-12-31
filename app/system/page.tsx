@@ -16,7 +16,7 @@ const DroneModel = dynamic(() => import("@/components/DroneModel"), {
 });
 
 const sections: Section[] = [
-  // --- Section 01 ---
+  // PX4 (content + component)
   {
     id: "section-01",
     type: "content",
@@ -25,21 +25,22 @@ const sections: Section[] = [
     content:
       "Users can describe missions in any language, and those instructions are converted into drone-ready commands using PX4, ensuring safe and regulation-compliant operation. The system connects user intent directly to flight behavior without manual configuration. This makes complex missions easy to launch and repeat.",
   },
-  // --- Component 01: Camera ---
   {
     id: "component-01",
     type: "component",
     caption: "Component 01",
-    title: "Camera System",
+    title: "PX4",
     content: "Insert content here.",
-    layerName: "camera",
+    layerName: "PX4",
+    media: { type: "video", src: "/videos/px4.mp4" },
     cameraConfig: {
-      position: [1.5, 0.5, 2],
+      position: [1, 1.5, 2],
       lookAtOffset: [0, 0, 0],
-      distance: 1.5,
+      distance: 2,
     },
   },
-  // --- Section 02 ---
+
+  // Jetson (content + component)
   {
     id: "section-02",
     type: "content",
@@ -48,21 +49,22 @@ const sections: Section[] = [
     content:
       "Flight paths are automatically planned to maximize coverage while adapting drone formations to the task. Jetson Nano enables onboard coordination and decision-making, allowing multiple drones to operate together efficiently without overlap. This architecture scales smoothly from small deployments to large-area operations.",
   },
-  // --- Component 02: LiDAR ---
   {
     id: "component-02",
     type: "component",
     caption: "Component 02",
-    title: "LiDAR",
+    title: "Jetson",
     content: "Insert content here.",
-    layerName: "LiDAR",
+    layerName: "Jetson",
+    media: { type: "video", src: "/videos/jetson.mp4" },
     cameraConfig: {
-      position: [2, 1, 1.5],
+      position: [0.5, 2, 1.5],
       lookAtOffset: [0, 0, 0],
       distance: 1.8,
     },
   },
-  // --- Section 03 ---
+
+  // Camera (content + component)
   {
     id: "section-03",
     type: "content",
@@ -71,21 +73,22 @@ const sections: Section[] = [
     content:
       "Using computer vision, the system processes camera data in real time to recognize user-defined objects trained from example images or online datasets. This allows drones to detect and focus on specific targets or features during flight. Recognition improves as more labeled data is added over time.",
   },
-  // --- Component 03: PX4 ---
   {
     id: "component-03",
     type: "component",
     caption: "Component 03",
-    title: "PX4",
+    title: "Camera System",
     content: "Insert content here.",
-    layerName: "PX4",
+    layerName: "camera",
+    media: { type: "video", src: "/videos/camera.mp4" },
     cameraConfig: {
-      position: [1, 1.5, 2],
+      position: [1.5, 0.5, 2],
       lookAtOffset: [0, 0, 0],
-      distance: 2,
+      distance: 1.5,
     },
   },
-  // --- Section 04 ---
+
+  // LiDAR (content + component)
   {
     id: "section-04",
     type: "content",
@@ -94,16 +97,16 @@ const sections: Section[] = [
     content:
       "The onboard AI processes environmental data to make real-time decisions during flight. Drones can adapt to changing conditions, avoid obstacles, and optimize their paths without human intervention. This enables truly autonomous operations in dynamic and unpredictable environments.",
   },
-  // --- Component 04: Jetson ---
   {
     id: "component-04",
     type: "component",
     caption: "Component 04",
-    title: "Jetson",
+    title: "LiDAR",
     content: "Insert content here.",
-    layerName: "Jetson",
+    layerName: "LiDAR",
+    media: { type: "video", src: "/videos/lidar.mp4" },
     cameraConfig: {
-      position: [0.5, 2, 1.5],
+      position: [2, 1, 1.5],
       lookAtOffset: [0, 0, 0],
       distance: 1.8,
     },
@@ -375,6 +378,7 @@ export default function SystemPage() {
                 caption={currentSection.caption}
                 title={currentSection.title}
                 content={currentSection.content}
+                media={isComponentSection(currentSection) ? currentSection.media : undefined}
                 onBack={goBack}
                 onNext={goNext}
                 canGoBack={canGoBack}

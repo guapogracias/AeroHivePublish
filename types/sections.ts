@@ -6,6 +6,18 @@ export interface CameraConfig {
   distance?: number;  // Distance multiplier from layer
 }
 
+export type SectionMedia =
+  | {
+      type: "video";
+      src: string;
+      poster?: string;
+    }
+  | {
+      type: "image";
+      src: string;
+      alt?: string;
+    };
+
 export interface BaseSection {
   id: string;
   caption: string;
@@ -22,6 +34,7 @@ export interface ComponentSection extends BaseSection {
   type: 'component';
   layerName: string;  // Maps to GLB object name
   cameraConfig: CameraConfig;
+  media?: SectionMedia;
 }
 
 export type Section = ContentSection | ComponentSection;

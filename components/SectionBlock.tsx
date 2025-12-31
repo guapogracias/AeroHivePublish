@@ -2,11 +2,13 @@
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import DecryptedText from "./DecryptedText";
+import type { SectionMedia } from "@/types/sections";
 
 interface SectionBlockProps {
   caption: string;
   title: string;
   content: string;
+  media?: SectionMedia;
   onBack?: () => void;
   onNext?: () => void;
   canGoBack?: boolean;
@@ -17,6 +19,7 @@ export default function SectionBlock({
   caption,
   title,
   content,
+  media,
   onBack,
   onNext,
   canGoBack = false,
@@ -40,6 +43,30 @@ export default function SectionBlock({
       <p className="text-body-md text-[var(--text-secondary)] mb-6">
         {content}
       </p>
+
+      {media?.type === "video" ? (
+        <div className="mb-6">
+          <video
+            className="w-full rounded-lg border border-[var(--divider)] bg-black/40"
+            src={media.src}
+            poster={media.poster}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        </div>
+      ) : null}
+
+      {media?.type === "image" ? (
+        <div className="mb-6">
+          <img
+            className="w-full rounded-lg border border-[var(--divider)] bg-black/40"
+            src={media.src}
+            alt={media.alt ?? title}
+          />
+        </div>
+      ) : null}
 
       {/* Navigation controls */}
       {(onBack || onNext) && (
