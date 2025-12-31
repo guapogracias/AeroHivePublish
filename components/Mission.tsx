@@ -13,13 +13,13 @@ export default function Mission() {
                     The Problem
                   </h2>
                   <p className="text-h2 text-[var(--text-primary)] mb-6">
-                    Farmers, foresters, and land owners make multimillion-dollar decisions with almost no real visibility.
+                    The world’s most valuable assets are still measured blindly.
                   </p>
-                  <p className="text-body-md text-[var(--text-secondary)] mb-8">
-                    They guess yields, guess biomass, guess risk, and guess the state of their land. Even today most operations rely on manual scouting, 2D imaging through satellites, and gut feeling to run their business. This lack of certainty creates direct financial pains.
+                  <p className="text-body-md text-[var(--text-secondary)] mb-6">
+                    Farmers, foresters, and landowners make high-stakes decisions with limited visibility. They rely on estimates, manual scouting, or outdated imagery to understand growth, risk, and change.
                   </p>
                   <p className="text-body-md text-[var(--text-secondary)]">
-                    Farmers hedge blindly on futures and often lose money. Foresters can’t measure biomass or disease spread at scale. Energy and infrastructure companies can’t quickly assess the state of large assets. Everyone is flying blind.
+                    Without accurate spatial understanding, they can’t reliably measure health, predict outcomes, or act early. This uncertainty leads to wasted resources, missed yield, delayed intervention, and preventable losses.
                   </p>
                 </div>
 
@@ -35,10 +35,16 @@ export default function Mission() {
                         The Solution
                     </h2>
                     <p className="text-h2 text-[var(--text-primary)] mb-6">
-                        AeroHive eliminates uncertainty.
+                        AeroHive turns the physical world into intelligence.
                     </p>
                     <p className="text-body-md text-[var(--text-secondary)] mb-6">
-                        We provide high-accuracy 3D models of land, crops, and assets not once per season but, whenever it matters. Our drone software allows customers to maintain an autonomous drone swarm, with actionable intelligence that tells them what's happening, where, and what it means for their bottom line.
+                        We generate high-fidelity 3D representations of land, crops, and infrastructure using autonomous drones. These models capture real structure and depth — not just photos — providing a precise digital view of the physical environment.
+                    </p>
+                    <p className="text-body-md text-[var(--text-secondary)] mb-6">
+                        AI then interprets these point clouds to understand what exists in the scene, how it is changing, and why it matters. The system identifies structure, growth patterns, anomalies, and spatial relationships that are invisible to traditional imagery. Over time, repeated scans allow changes to be measured, compared, and predicted.
+                    </p>
+                    <p className="text-body-md text-[var(--text-secondary)]">
+                        Instead of delivering raw data, AeroHive produces understanding. Users receive clear, actionable insight into what’s happening, where it’s happening, and what it means for operations, risk, and decision-making on the ground.
                     </p>
                 </div>
             </div>
