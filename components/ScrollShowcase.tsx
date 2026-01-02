@@ -112,6 +112,7 @@ export default function ScrollShowcase({
   const [activeWithinGroup, setActiveWithinGroup] = useState(0);
 
   const [frameWidth, setFrameWidth] = useState(0);
+  const [frameHeight, setFrameHeight] = useState(0);
   const [prevGroupIndex, setPrevGroupIndex] = useState<number | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [transitionAnimate, setTransitionAnimate] = useState(false);
@@ -120,7 +121,9 @@ export default function ScrollShowcase({
   // Layout constants (px). These ensure cards never look related across categories,
   // and that scaled cards don't get clipped by the viewport.
   const CARD_GAP_PX = 16; // tighter gaps so cards can be wider (3-up)
-  const GROUP_SIDE_PADDING_PX = 16; // keep cards wide, still avoid edge clipping
+  const GROUP_SIDE_PADDING_PX = 12; // minimal gutter so active scale doesn't clip at viewport edges
+  const TEXT_PANEL_H_PX = 272; // bigger, consistent text panel height across cards
+  const CARD_MAX_H_PX = 9999; // allow cards to fill available stage height (no cap)
   const CATEGORY_TRANSITION_MS = 420;
   const CATEGORY_TRANSITION_PX = 44;
   const CATEGORY_TRANSITION_BLUR_PX = 6;
@@ -147,7 +150,11 @@ export default function ScrollShowcase({
   useEffect(() => {
     const el = frameRef.current;
     if (!el) return;
-    const compute = () => setFrameWidth(el.getBoundingClientRect().width);
+    const compute = () => {
+      const rect = el.getBoundingClientRect();
+      setFrameWidth(rect.width);
+      setFrameHeight(rect.height);
+    };
     compute();
     const ro = new ResizeObserver(() => compute());
     ro.observe(el);
@@ -250,7 +257,7 @@ export default function ScrollShowcase({
               </div>
 
               {/* Pill nav (like the reference) */}
-              <div className="flex items-center gap-2 bg-white/5 border border-[var(--divider)] rounded-full p-1.5 w-fit">
+              <div className="flex items-center gap-2 bg-[var(--surface-1)] border border-[var(--divider)] rounded-full p-1.5 w-fit">
                 {(["Plan", "Analyze", "Act"] as const).map((label) => {
                   const isActive = activeCategory === label;
                   return (
@@ -261,7 +268,7 @@ export default function ScrollShowcase({
                       className={[
                         "px-6 py-3 rounded-full text-body-sm font-medium transition-colors",
                         isActive
-                          ? "bg-white text-[var(--text-dark)]"
+                          ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
                       ].join(" ")}
                     >
@@ -273,23 +280,26 @@ export default function ScrollShowcase({
             </div>
 
             {/* Horizontal scrollytelling track (3-up pages) */}
-            <div className="flex-1 flex items-start pt-6 md:pt-8">
+            <div className="flex-1 flex items-stretch min-h-0 pt-4 md:pt-4">
               <div
                 ref={frameRef}
-                className="w-screen overflow-x-hidden overflow-y-visible"
+                className="w-screen flex-1 overflow-x-hidden overflow-y-visible"
                 style={{
-                  // Full-bleed row so each card can be significantly wider.
+                  // Full-bleed row so the 3 cards can span the whole viewport width.
                   marginLeft: "calc(50% - 50vw)",
                   marginRight: "calc(50% - 50vw)",
                   paddingLeft: GROUP_SIDE_PADDING_PX,
                   paddingRight: GROUP_SIDE_PADDING_PX,
-                  paddingTop: 12,
-                  paddingBottom: 12,
+                  paddingTop: 0,
+                  paddingBottom: 0,
                 }}
               >
             {(() => {
               const usableW = frameWidth ? Math.max(1, frameWidth - GROUP_SIDE_PADDING_PX * 2) : 0;
               const cardW = usableW ? Math.floor((usableW - CARD_GAP_PX * 2) / 3) : undefined;
+              const stageH = frameHeight || 0;
+              // Keep the whole card within the pinned stage.
+              const cardH = stageH ? Math.max(420, Math.min(CARD_MAX_H_PX, Math.floor(stageH - 2))) : undefined;
 
               const enterFrom = transitionDir === 1 ? CATEGORY_TRANSITION_PX : -CATEGORY_TRANSITION_PX;
               const exitTo = transitionDir === 1 ? -CATEGORY_TRANSITION_PX : CATEGORY_TRANSITION_PX;
@@ -335,16 +345,17 @@ export default function ScrollShowcase({
                           className={[
                             // NOTE: don't clip the whole card — only clip the image area —
                             // so longer descriptions never get cut off.
-                            "rounded-xl border bg-white/5 flex flex-col",
-                            isActive ? "border-white/25" : "border-[var(--divider)]",
+                            "rounded-xl border bg-[var(--surface-1)] flex flex-col",
+                            isActive ? "border-[var(--wheel-stroke)]" : "border-[var(--divider)]",
                             "transition-transform duration-300 ease-out",
                           ].join(" ")}
                           style={{
                             width: cardW ? `${cardW}px` : "33.333%",
-                            transform: `scale(${isActive ? 1.03 : 0.99})`,
+                            height: cardH ? `${cardH}px` : undefined,
+                            transform: `scale(${isActive ? 1.015 : 0.995})`,
                           }}
                         >
-                          <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-xl bg-white">
+                          <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-white">
                             {item.imageSrc ? (
                               <Image
                                 src={item.imageSrc}
@@ -362,12 +373,12 @@ export default function ScrollShowcase({
                               </div>
                             )}
                           </div>
-                          <div className="p-6 flex-1">
+                          <div className="p-6 shrink-0" style={{ height: TEXT_PANEL_H_PX }}>
                             {/* Keep titles on one line consistently */}
-                            <div className="text-[20px] leading-[28px] font-medium text-[var(--text-primary)] truncate">
+                            <div className="text-[18px] leading-[26px] font-medium text-[var(--text-primary)] truncate">
                               {item.title}
                             </div>
-                            <div className="text-body text-[var(--text-secondary)] mt-3">
+                            <div className="text-body text-[var(--text-secondary)] mt-3 line-clamp-4">
                               {item.description}
                             </div>
                           </div>
@@ -383,8 +394,8 @@ export default function ScrollShowcase({
                 <div
                   className="relative"
                   style={{
-                    height: "auto",
-                    minHeight: 10,
+                    height: cardH ? `${cardH}px` : "auto",
+                    minHeight: cardH ? `${cardH}px` : 10,
                   }}
                 >
                   {/* Preserve layout height */}
@@ -393,12 +404,15 @@ export default function ScrollShowcase({
                       <div
                         key={`sizer-${withinIdx}`}
                         className="rounded-xl"
-                        style={{ width: cardW ? `${cardW}px` : "33.333%" }}
+                        style={{
+                          width: cardW ? `${cardW}px` : "33.333%",
+                          height: cardH ? `${cardH}px` : undefined,
+                        }}
                       >
                         {/* Match the live card proportions for stable layout height */}
-                        <div className="w-full aspect-[16/9]" />
-                        <div className="p-6">
-                          <div className="text-[20px] leading-[28px] font-medium">Sizer</div>
+                        <div className="w-full flex-1" />
+                        <div className="p-6 shrink-0" style={{ height: TEXT_PANEL_H_PX }}>
+                          <div className="text-[18px] leading-[26px] font-medium">Sizer</div>
                           <div className="text-body mt-3">Sizer line</div>
                         </div>
                       </div>

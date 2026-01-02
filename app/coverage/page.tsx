@@ -11,8 +11,8 @@ export default function ApplicationPage() {
             className="absolute inset-0"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px)
+                linear-gradient(var(--grid-line-soft) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-line-soft) 1px, transparent 1px)
               `,
               backgroundSize: "160px 160px",
               opacity: 0.18,

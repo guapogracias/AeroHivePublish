@@ -2,7 +2,7 @@ import ProfoundIsotypeASCII from './ProfoundIsotypeASCII';
 
 export default function Hero() {
   return (
-    <section className="relative w-full min-h-[100vh] bg-[#000000] overflow-hidden">
+    <section className="relative w-full min-h-[100vh] bg-[var(--bg-black)] overflow-hidden">
       {/* Container with max-width and padding */}
       <div className="container-main relative h-full min-h-[100vh]">
         {/* Mobile: 2-column grid, Desktop: 4-column grid */}

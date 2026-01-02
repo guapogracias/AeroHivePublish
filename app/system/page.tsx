@@ -292,8 +292,8 @@ export default function SystemPage() {
         onMouseLeave={handleGridMouseLeave}
         style={{
           backgroundImage: `
-            linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+            linear-gradient(var(--grid-line) 1px, transparent 1px),
+            linear-gradient(90deg, var(--grid-line) 1px, transparent 1px)
           `,
           backgroundSize: '40px 40px',
         }}
@@ -309,7 +309,9 @@ export default function SystemPage() {
               top: `${cell.row * 40}px`,
               width: '40px',
               height: '40px',
-              backgroundColor: cell.isHovered ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.05)',
+              backgroundColor: cell.isHovered
+                ? 'var(--grid-cell-hover)'
+                : 'var(--grid-cell)',
               opacity: cell.opacity,
               pointerEvents: 'none',
             }}

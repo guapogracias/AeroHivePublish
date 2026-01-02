@@ -52,7 +52,7 @@ export default function ProcessPhases() {
         <div className="container-main relative">
           <div className="grid -mx-4 items-stretch flex-col md:grid md:grid-cols-4">
             {/* Left box - Mobile: small height, Desktop: spans 2 columns */}
-            <div className="relative col-span-2 bg-[#0F0F0F] border-t border-b border-l border-r md:border-r-0 border-[var(--divider)] flex flex-col min-h-[200px] md:min-h-auto">
+            <div className="relative col-span-2 bg-[var(--surface-1)] border-t border-b border-l border-r md:border-r-0 border-[var(--divider)] flex flex-col min-h-[200px] md:min-h-auto">
               {/* Mobile: Small box with minimal padding, Desktop: Full height sticky */}
               <div className="relative flex-1">
                 <div className="px-8 py-4 md:sticky md:px-8 md:py-8 flex items-center md:items-start" style={{ top: '54px', bottom: '32px' }}>
@@ -66,7 +66,7 @@ export default function ProcessPhases() {
             </div>
 
             {/* Right box - Mobile: stacked, Desktop: spans 2 columns */}
-            <div className="relative col-span-2 bg-[#0F0F0F] border-t border-b border-l border-r md:border-l-0 border-[var(--divider)] flex flex-col">
+            <div className="relative col-span-2 bg-[var(--surface-1)] border-t border-b border-l border-r md:border-l-0 border-[var(--divider)] flex flex-col">
               <div className="flex flex-col">
                 <div className="relative">
                   <ProcessStep

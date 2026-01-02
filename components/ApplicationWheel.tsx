@@ -239,7 +239,7 @@ export default function ApplicationWheel({
                       preserveAspectRatio="xMidYMid slice"
                     />
                   ) : (
-                    <rect x="0" y="0" width="1" height="1" fill="rgba(255,255,255,0.06)" />
+                    <rect x="0" y="0" width="1" height="1" fill="var(--wheel-fill)" />
                   )}
                 </pattern>
               ))}
@@ -269,9 +269,11 @@ export default function ApplicationWheel({
                 <path
                   key={seg.id}
                   d={d}
-                  fill={seg.imageSrc ? `url(#pat-${seg.id})` : "rgba(255,255,255,0.06)"}
-                  stroke="rgba(255,255,255,0.20)"
-                  strokeWidth={isHovered ? 2 : 1}
+                  fill={seg.imageSrc ? `url(#pat-${seg.id})` : "var(--wheel-fill)"}
+                  stroke="var(--wheel-stroke)"
+                  strokeWidth={isHovered ? 3 : 2}
+                  strokeLinejoin="round"
+                  paintOrder="stroke"
                   style={{ cursor: isClickable ? "pointer" : "default" }}
                   onMouseEnter={() => setHoveredId(seg.id)}
                   onMouseLeave={() => setHoveredId(null)}
@@ -288,7 +290,7 @@ export default function ApplicationWheel({
                   y={geometry.cy - 4}
                   textAnchor="middle"
                   fontSize="16"
-                  fill="rgba(255,255,255,0.78)"
+                  fill="var(--wheel-text)"
                 >
                   Select a segment
                 </text>
@@ -297,7 +299,7 @@ export default function ApplicationWheel({
                   y={geometry.cy + 18}
                   textAnchor="middle"
                   fontSize="16"
-                  fill="rgba(255,255,255,0.78)"
+                  fill="var(--wheel-text)"
                 >
                   to explore.
                 </text>
@@ -308,8 +310,8 @@ export default function ApplicationWheel({
                   cx={geometry.cx}
                   cy={geometry.cy}
                   r={geometry.centerR}
-                  fill="rgba(255,255,255,0.06)"
-                  stroke="rgba(255,255,255,0.20)"
+                  fill="var(--wheel-fill)"
+                  stroke="var(--wheel-stroke)"
                   strokeWidth="1"
                   style={{ cursor: canGoBack ? "pointer" : "default" }}
                   onClick={canGoBack ? onBack : undefined}

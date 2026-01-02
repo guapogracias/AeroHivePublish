@@ -18,6 +18,21 @@
   --divider: #232323;
   --border: #232323;
 
+  /* Surfaces */
+  --surface-1: rgba(255, 255, 255, 0.05);
+  --surface-2: rgba(255, 255, 255, 0.08);
+
+  /* Theme-aware accents (grid/wheel/dots) */
+  --grid-line: rgba(255, 255, 255, 0.05);
+  --grid-line-soft: rgba(255, 255, 255, 0.04);
+  --grid-cell: rgba(255, 255, 255, 0.05);
+  --grid-cell-hover: rgba(255, 255, 255, 0.10);
+  --dotted-line: rgba(255, 255, 255, 0.20);
+
+  --wheel-stroke: rgba(255, 255, 255, 0.20);
+  --wheel-fill: rgba(255, 255, 255, 0.06);
+  --wheel-text: rgba(255, 255, 255, 0.78);
+
   /* Layout */
   --container-max: 1088px;
   --container-padding: 16px;
@@ -29,6 +44,40 @@
   --tracking-body-lg: -0.045px;
   --tracking-body: -0.2px;
   --radius: 0.625rem;
+}
+
+html[data-theme="light"] {
+  /* Background Colors */
+  --bg-primary: #ffffff;
+  --bg-black: #ffffff;
+  --bg-header: rgba(255, 255, 255, 0.85);
+
+  /* Text Colors */
+  --text-primary: #111827; /* near-black */
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-dark: #111827;
+
+  /* UI Colors */
+  --btn-dark: #111827;
+  --btn-light: #ffffff;
+  --divider: rgba(17, 24, 39, 0.14);
+  --border: rgba(17, 24, 39, 0.14);
+
+  /* Surfaces */
+  --surface-1: rgba(17, 24, 39, 0.04);
+  --surface-2: rgba(17, 24, 39, 0.07);
+
+  /* Theme-aware accents (grid/wheel/dots) */
+  --grid-line: rgba(17, 24, 39, 0.16);
+  --grid-line-soft: rgba(17, 24, 39, 0.14);
+  --grid-cell: rgba(17, 24, 39, 0.06);
+  --grid-cell-hover: rgba(17, 24, 39, 0.12);
+  --dotted-line: rgba(17, 24, 39, 0.28);
+
+  --wheel-stroke: rgba(17, 24, 39, 0.38);
+  --wheel-fill: rgba(17, 24, 39, 0.06);
+  --wheel-text: rgba(17, 24, 39, 0.78);
 }
 
 @theme inline {
@@ -132,6 +181,7 @@ body {
 .btn-primary {
   background-color: var(--btn-light);
   color: var(--text-dark);
+  border: 1px solid var(--divider);
   padding: 6px 12px;
   border-radius: 8px;
   font-size: 14px;
@@ -172,7 +222,7 @@ body {
 /* Dotted Line */
 .dotted-line {
   width: 1px;
-  background-image: linear-gradient(to bottom, #333 33%, rgba(255, 255, 255, 0) 0%);
+  background-image: linear-gradient(to bottom, var(--dotted-line) 33%, rgba(255, 255, 255, 0) 0%);
   background-position: right;
   background-size: 1px 12px;
   background-repeat: repeat-y;

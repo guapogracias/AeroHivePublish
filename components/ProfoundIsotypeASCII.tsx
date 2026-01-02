@@ -63,7 +63,8 @@ const ASCII_CONTENT = `
 `;
 
 export default function ProfoundIsotypeASCII({ animated = true }: ProfoundIsotypeASCIIProps) {
-  const className = "text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[#FFFFFF] font-mono whitespace-pre text-center select-none overflow-hidden";
+  const className =
+    "text-[6.4px] leading-[4.8px] md:text-[12.8px] md:leading-[8px] text-[var(--text-primary)] font-mono whitespace-pre text-center select-none overflow-hidden";
   
   if (animated) {
     return (
