@@ -21,67 +21,67 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
   // Plan (3)
   {
     label: "Plan",
-    title: "Spatial Scope",
+    title: "Define operational boundaries and restricted areas",
     description:
-      "Define and manage operational boundaries, restricted zones, and geofenced regions that govern where missions may occur.",
+      "Set clear geographic limits for where work can and cannot happen, including exclusion zones, permissions, and areas of interest that guide all operations.",
     imageSrc: "/images/platformoverview/spatialscope.png",
     imageAlt: "Spatial Scope",
   },
   {
     label: "Plan",
-    title: "Asset Registry",
+    title: "Account for real-world context like weather, terrain, and access",
     description:
-      "Maintain a unified inventory of physical and logical assets with persistent IDs, locations, and historical records.",
+      "Incorporate environmental and operational conditions to understand feasibility, data quality, and risk before and during execution.",
     imageSrc: "/images/platformoverview/assertregistry.png",
     imageAlt: "Asset Registry",
   },
   {
     label: "Plan",
-    title: "Mission Design",
+    title: "Design reusable missions and data-collection workflows",
     description:
-      "Create reusable mission templates that define coverage patterns, sensor configurations, constraints, and execution rules.",
+      "Create repeatable templates that define how data is collected, which sensors are used, and what rules or constraints apply, ensuring consistency across missions.",
     imageSrc: "/images/platformoverview/missiondesign.png",
     imageAlt: "Mission Design",
   },
   // Analyze (3)
   {
     label: "Analyze",
-    title: "Temporal Change Analysis",
+    title: "Detect change over time across repeated scans",
     description:
-      "Detect and quantify differences across time to surface movement, degradation, growth, or progress.",
+      "Compare data from different points in time to reveal movement, growth, degradation, or other meaningful changes that would be hard to detect manually.",
     imageSrc: "/images/platformoverview/temporalchange.png",
     imageAlt: "Temporal Change Analysis",
   },
   {
     label: "Analyze",
-    title: "Condition Intelligence",
+    title: "Assess condition, health, and risk",
     description:
-      "Assess the current state, risk level, or integrity of assets and surfaces using derived spatial indicators.",
+      "Evaluate the current state of land, structures, or assets using derived indicators that highlight stress, deterioration, or potential failure.",
     imageSrc: "/images/platformoverview/conditionintelligence.png",
     imageAlt: "Condition Intelligence",
   },
   {
     label: "Analyze",
-    title: "Operational Context",
+    title: "Maintain an inventory of assets",
     description:
-      "Evaluate environmental and situational factors—weather, terrain, access, signal quality—that affect data quality and mission feasibility.",
+      "Assets are given persistent IDs and linked to exact locations, making it possible to locate them and see when they were last observed.",
     imageSrc: "/images/platformoverview/operationalcontext.png",
     imageAlt: "Operational Context",
   },
   // Act (3)
   {
     label: "Act",
-    title: "Action Planning",
+    title: "Generate and prioritize recommended actions",
     description:
-      "Translate analysis into prioritized, location-specific actions such as inspections, maintenance, mitigation, or follow-up scans.",
+      "Translate insights into clear, location-specific actions such as inspections, maintenance, or follow-ups, ranked by urgency and impact.",
     imageSrc: "/images/platformoverview/actionplanning.png",
     imageAlt: "Action Planning",
   },
   {
     label: "Act",
-    title: "Execution Management",
+    title: "Learn from outcomes to improve future decisions and plans",
     description:
-      "Assign tasks, schedule operations, and track completion across teams with evidence and audit trails.",
+      "Use results and feedback from completed actions to refine recommendations, improve planning, and continuously improve performance over time.",
     imageSrc: "/images/platformoverview/executionmanagement.png",
     imageAlt: "Execution Management",
   },
@@ -96,7 +96,7 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
 ];
 
 export default function ScrollShowcase({
-  heading = "Platform overview",
+  heading = "Features",
   subheading,
   items = DEFAULT_ITEMS,
 }: {
@@ -250,7 +250,7 @@ export default function ScrollShowcase({
               </div>
 
               {/* Pill nav (like the reference) */}
-              <div className="flex items-center gap-2 bg-white/5 border border-[var(--divider)] rounded-full p-1 w-fit">
+              <div className="flex items-center gap-2 bg-white/5 border border-[var(--divider)] rounded-full p-1.5 w-fit">
                 {(["Plan", "Analyze", "Act"] as const).map((label) => {
                   const isActive = activeCategory === label;
                   return (
@@ -259,7 +259,7 @@ export default function ScrollShowcase({
                       type="button"
                       onClick={() => scrollToCategory(label)}
                       className={[
-                        "px-4 py-2 rounded-full text-small transition-colors",
+                        "px-6 py-3 rounded-full text-body-sm font-medium transition-colors",
                         isActive
                           ? "bg-white text-[var(--text-dark)]"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
@@ -344,14 +344,14 @@ export default function ScrollShowcase({
                             transform: `scale(${isActive ? 1.03 : 0.99})`,
                           }}
                         >
-                          <div className="relative w-full h-[52vh] overflow-hidden rounded-t-xl">
+                          <div className="relative w-full aspect-[16/9] overflow-hidden rounded-t-xl bg-white">
                             {item.imageSrc ? (
                               <Image
                                 src={item.imageSrc}
                                 alt={item.imageAlt ?? item.title}
                                 fill
                                 sizes="(min-width: 1024px) 33vw, 90vw"
-                                className="object-contain bg-black/20"
+                                className="object-contain"
                                 priority={gIdx === 0 && withinIdx === 0}
                               />
                             ) : (
@@ -396,7 +396,7 @@ export default function ScrollShowcase({
                         style={{ width: cardW ? `${cardW}px` : "33.333%" }}
                       >
                         {/* Match the live card proportions for stable layout height */}
-                        <div className="w-full h-[52vh]" />
+                        <div className="w-full aspect-[16/9]" />
                         <div className="p-6">
                           <div className="text-[20px] leading-[28px] font-medium">Sizer</div>
                           <div className="text-body mt-3">Sizer line</div>
