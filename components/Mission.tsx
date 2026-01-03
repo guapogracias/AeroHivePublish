@@ -1,4 +1,6 @@
-import SilverMapleViewer from "./SilverMapleViewer";
+// TEMP: Maple model is disabled to stabilize Vercel deploys.
+// To re-enable: uncomment the import and the <SilverMapleViewer /> usage below.
+// import SilverMapleViewer from "./SilverMapleViewer";
 
 export default function Mission() {
   return (
@@ -26,7 +28,15 @@ export default function Mission() {
                 {/* Center: 3D model (between Problem and Solution) */}
                 <div className="col-span-2 md:col-span-6 mt-10 md:mt-0 flex items-stretch justify-center">
                   {/* No “box” styling — just a full-bleed canvas area */}
-                  <SilverMapleViewer />
+                  {/*
+                    <SilverMapleViewer />
+                  */}
+
+                  {/* Placeholder while Maple is disabled */}
+                  <div className="w-full h-full min-h-[520px] md:min-h-[720px] flex items-center justify-center text-[var(--text-secondary)]">
+                    {/* Keep this subtle so the section layout stays the same */}
+                    <span className="text-body-md">3D model temporarily disabled</span>
+                  </div>
                 </div>
 
                 {/* Solution */}
