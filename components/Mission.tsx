@@ -2,7 +2,7 @@ import SilverMapleViewer from "./SilverMapleViewer";
 
 export default function Mission() {
   return (
-    <section className="relative border-b border-[var(--divider)]">
+    <section className="relative border-y border-[var(--divider)]">
         {/* Full-width layout: push text toward page edges to maximize center space for the model */}
         <div className="w-full relative px-6 md:px-10">
             <div className="grid grid-cols-2 md:grid-cols-12 gap-6 md:gap-8 py-16 md:py-24 items-stretch">

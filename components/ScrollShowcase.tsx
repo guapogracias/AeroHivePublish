@@ -121,9 +121,13 @@ export default function ScrollShowcase({
   // Layout constants (px). These ensure cards never look related across categories,
   // and that scaled cards don't get clipped by the viewport.
   const CARD_GAP_PX = 16; // tighter gaps so cards can be wider (3-up)
-  const GROUP_SIDE_PADDING_PX = 12; // minimal gutter so active scale doesn't clip at viewport edges
-  const TEXT_PANEL_H_PX = 272; // bigger, consistent text panel height across cards
-  const CARD_MAX_H_PX = 9999; // allow cards to fill available stage height (no cap)
+  const GROUP_SIDE_PADDING_PX = 16; // keep cards wide, still avoid edge clipping
+  const TEXT_PANEL_H_PX = 220; // give more room to the image area (still enough for 3-4 lines of text)
+  const CARD_MAX_H_PX = 2000; // effectively uncapped on typical viewports (lets cards fill the stage)
+  const ACTIVE_SCALE = 1.02;
+  const INACTIVE_SCALE = 0.99;
+  // When the active card scales up, we need a little extra breathing room so it never clips.
+  const ACTIVE_CLIP_SAFETY_PX = 24;
   const CATEGORY_TRANSITION_MS = 420;
   const CATEGORY_TRANSITION_PX = 44;
   const CATEGORY_TRANSITION_BLUR_PX = 6;
@@ -237,16 +241,21 @@ export default function ScrollShowcase({
       ref={sectionRef}
       className="relative w-full bg-[var(--bg-black)] border-y border-[var(--divider)]"
       // Tall section to create scroll distance that advances across 9 cards.
-      style={{ height: `calc(${Math.max(items.length, 1)} * 90vh)` }}
+      // Keep scrollytelling, but avoid a huge "dead" scroll gap before the next section.
+      // Smaller multiplier = you progress through cards faster and reach Roadmap sooner.
+      style={{ height: `calc(${Math.max(items.length, 1)} * 55vh)` }}
     >
       {/* Full-viewport pinned stage (like the reference). Scrolling the page advances steps. */}
       <div
-        className="sticky flex items-start"
+        className="sticky flex items-start w-full"
         style={{ top: HEADER_HEIGHT_PX, height: `calc(100vh - ${HEADER_HEIGHT_PX}px)` }}
       >
-        <div className="container-main max-w-[1680px] w-full py-6 md:py-8">
+        {/* Tighten vertical padding so cards can fill the stage like the reference */}
+        {/* NOTE: Don't use `container-main` here — its CSS is defined after Tailwind and will override `max-w-*`.
+           We want this section to be much wider (reference proportions). */}
+        <div className="mx-auto w-full max-w-[1920px] h-full px-4 md:px-8 pt-2 pb-1 md:pt-3 md:pb-2">
           <div className="flex flex-col h-full">
-            <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="relative z-30 flex flex-col gap-2 pb-2 md:flex-row md:items-end md:justify-between">
               <div className="max-w-[680px]">
                 <h2 className="text-h1 text-[var(--text-primary)]">{heading}</h2>
                 {subheading ? (
@@ -280,18 +289,16 @@ export default function ScrollShowcase({
             </div>
 
             {/* Horizontal scrollytelling track (3-up pages) */}
-            <div className="flex-1 flex items-stretch min-h-0 pt-4 md:pt-4">
+            <div className="flex-1 flex items-stretch min-h-0 pt-3 md:pt-3">
               <div
                 ref={frameRef}
-                className="w-screen flex-1 overflow-x-hidden overflow-y-visible"
+                className="w-full flex-1 overflow-visible"
                 style={{
-                  // Full-bleed row so the 3 cards can span the whole viewport width.
-                  marginLeft: "calc(50% - 50vw)",
-                  marginRight: "calc(50% - 50vw)",
                   paddingLeft: GROUP_SIDE_PADDING_PX,
                   paddingRight: GROUP_SIDE_PADDING_PX,
                   paddingTop: 0,
                   paddingBottom: 0,
+                  height: "100%",
                 }}
               >
             {(() => {
@@ -299,7 +306,13 @@ export default function ScrollShowcase({
               const cardW = usableW ? Math.floor((usableW - CARD_GAP_PX * 2) / 3) : undefined;
               const stageH = frameHeight || 0;
               // Keep the whole card within the pinned stage.
-              const cardH = stageH ? Math.max(420, Math.min(CARD_MAX_H_PX, Math.floor(stageH - 2))) : undefined;
+              // Use nearly the full available rail height (lets the 3 cards "take up the screen").
+              const cardH = stageH
+                ? Math.max(
+                    420,
+                    Math.min(CARD_MAX_H_PX, Math.floor(stageH - ACTIVE_CLIP_SAFETY_PX))
+                  )
+                : undefined;
 
               const enterFrom = transitionDir === 1 ? CATEGORY_TRANSITION_PX : -CATEGORY_TRANSITION_PX;
               const exitTo = transitionDir === 1 ? -CATEGORY_TRANSITION_PX : CATEGORY_TRANSITION_PX;
@@ -352,7 +365,9 @@ export default function ScrollShowcase({
                           style={{
                             width: cardW ? `${cardW}px` : "33.333%",
                             height: cardH ? `${cardH}px` : undefined,
-                            transform: `scale(${isActive ? 1.015 : 0.995})`,
+                            // Prevent bottom clipping when scaling the active card by growing upward.
+                            transformOrigin: "center bottom",
+                            transform: `scale(${isActive ? ACTIVE_SCALE : INACTIVE_SCALE})`,
                           }}
                         >
                           <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-white">
