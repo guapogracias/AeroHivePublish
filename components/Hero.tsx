@@ -39,7 +39,7 @@ export default function Hero() {
             
             {/* Subheading */}
             <p className="text-[22px] leading-[30px] tracking-[-0.2px] md:text-[32px] md:leading-[40px] md:tracking-[-0.6px] text-[var(--text-primary)] text-center max-w-2xl opacity-80">
-              Be everywhere
+              Be Everywhere
             </p>
           </div>
         </div>

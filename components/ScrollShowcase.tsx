@@ -390,7 +390,7 @@ export default function ScrollShowcase({
                           </div>
                           <div className="p-6 shrink-0" style={{ height: TEXT_PANEL_H_PX }}>
                             {/* Keep titles on one line consistently */}
-                            <div className="text-[18px] leading-[26px] font-medium text-[var(--text-primary)] truncate">
+                            <div className="text-[20px] leading-[28px] md:text-[22px] md:leading-[30px] font-medium text-[var(--text-primary)] truncate">
                               {item.title}
                             </div>
                             <div className="text-body text-[var(--text-secondary)] mt-3 line-clamp-4">

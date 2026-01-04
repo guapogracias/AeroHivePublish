@@ -9,9 +9,27 @@ type SwarmNode = {
   xPct: number;
   yPct: number;
   scale: number;
-  delayS: number;
-  durS: number;
+  /** Drift tuning (deterministic) */
+  ampPx: number;
+  speed: number;
 };
+
+// Explicit, deterministic connections (prevents long diagonals + avoids any layout-dependent graph changes).
+// Split into a few “groups” (not all drones connected).
+const EDGES: Array<[string, string]> = [
+  // Group A (top / center-ish)
+  ["a", "b"],
+  ["b", "c"],
+  ["b", "k"],
+  // Group B (left side)
+  ["d", "e"],
+  ["e", "f"],
+  // Group C (right side)
+  ["g", "h"],
+  ["h", "i"],
+  // Group D (bottom)
+  ["j", "l"],
+];
 
 function normalizeAsciiArt(raw: string) {
   const lines = raw.replace(/\r/g, "").split("\n");
@@ -33,33 +51,46 @@ function normalizeAsciiArt(raw: string) {
 
 const DRONE_ASCII = normalizeAsciiArt(PROFOUND_ISOTYPE_ASCII_CONTENT);
 
-function dist2(a: { x: number; y: number }, b: { x: number; y: number }) {
-  const dx = a.x - b.x;
-  const dy = a.y - b.y;
-  return dx * dx + dy * dy;
+function hashId(id: string) {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h;
+}
+
+function driftOffset(node: SwarmNode, tSec: number) {
+  // Deterministic phases per id so it never “randomizes” on reload.
+  const h = hashId(node.id);
+  const phase1 = ((h % 360) * Math.PI) / 180;
+  const phase2 = (((h >>> 8) % 360) * Math.PI) / 180;
+  const dx = Math.sin(tSec * node.speed + phase1) * node.ampPx;
+  const dy = Math.cos(tSec * (node.speed * 0.9) + phase2) * (node.ampPx * 0.75);
+  return { dx, dy };
 }
 
 export default function DroneSwarmASCII() {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const [size, setSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [tMs, setTMs] = useState(0);
 
   // Tuned to resemble the reference: drones spread across the hero, leaving the center for text.
   const nodes: SwarmNode[] = useMemo(
     () => [
-      // Slightly larger than before (~20%) and spread wider to fill the hero.
-      { id: "a", xPct: 12, yPct: 18, scale: 0.74, delayS: 0.0, durS: 6.6 },
-      { id: "b", xPct: 50, yPct: 12, scale: 0.82, delayS: 0.4, durS: 6.9 },
-      { id: "c", xPct: 88, yPct: 18, scale: 0.74, delayS: 0.8, durS: 6.4 },
-      { id: "d", xPct: 8, yPct: 48, scale: 0.70, delayS: 0.2, durS: 7.1 },
-      { id: "e", xPct: 92, yPct: 48, scale: 0.70, delayS: 0.6, durS: 7.3 },
-      { id: "f", xPct: 14, yPct: 82, scale: 0.74, delayS: 0.3, durS: 6.8 },
-      { id: "g", xPct: 50, yPct: 88, scale: 0.82, delayS: 0.7, durS: 7.0 },
-      { id: "h", xPct: 86, yPct: 82, scale: 0.74, delayS: 0.5, durS: 6.7 },
-      { id: "i", xPct: 30, yPct: 70, scale: 0.68, delayS: 0.1, durS: 7.4 },
-      { id: "j", xPct: 70, yPct: 70, scale: 0.68, delayS: 0.9, durS: 7.2 },
-      // Extra nodes to cover more space
-      { id: "k", xPct: 24, yPct: 34, scale: 0.66, delayS: 0.15, durS: 7.6 },
-      { id: "l", xPct: 76, yPct: 34, scale: 0.66, delayS: 0.55, durS: 7.8 },
+      // Uneven / organic spread (deterministic, no randomness on reload)
+      { id: "a", xPct: 20, yPct: 16, scale: 0.76, ampPx: 3.2, speed: 0.55 },
+      { id: "b", xPct: 56, yPct: 12, scale: 0.84, ampPx: 3.6, speed: 0.52 },
+      { id: "c", xPct: 86, yPct: 20, scale: 0.74, ampPx: 3.0, speed: 0.58 },
+      { id: "k", xPct: 38, yPct: 30, scale: 0.66, ampPx: 2.8, speed: 0.62 },
+
+      { id: "d", xPct: 12, yPct: 48, scale: 0.72, ampPx: 3.2, speed: 0.60 },
+      { id: "e", xPct: 26, yPct: 58, scale: 0.64, ampPx: 2.6, speed: 0.70 },
+      { id: "f", xPct: 18, yPct: 78, scale: 0.70, ampPx: 3.0, speed: 0.57 },
+
+      { id: "g", xPct: 78, yPct: 44, scale: 0.70, ampPx: 3.0, speed: 0.63 },
+      { id: "h", xPct: 90, yPct: 58, scale: 0.64, ampPx: 2.6, speed: 0.68 },
+      { id: "i", xPct: 82, yPct: 76, scale: 0.70, ampPx: 3.0, speed: 0.56 },
+
+      { id: "j", xPct: 44, yPct: 86, scale: 0.78, ampPx: 3.4, speed: 0.50 },
+      { id: "l", xPct: 64, yPct: 90, scale: 0.70, ampPx: 3.0, speed: 0.54 },
     ],
     []
   );
@@ -77,43 +108,31 @@ export default function DroneSwarmASCII() {
     return () => ro.disconnect();
   }, []);
 
+  useEffect(() => {
+    let raf = 0;
+    const start = performance.now();
+    const tick = () => {
+      setTMs(performance.now() - start);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   const points = useMemo(() => {
     const w = Math.max(1, size.w);
     const h = Math.max(1, size.h);
+    const tSec = tMs / 1000;
     return nodes.map((n) => ({
       id: n.id,
-      x: (n.xPct / 100) * w,
-      y: (n.yPct / 100) * h,
+      ...(() => {
+        const baseX = (n.xPct / 100) * w;
+        const baseY = (n.yPct / 100) * h;
+        const { dx, dy } = driftOffset(n, tSec);
+        return { x: baseX + dx, y: baseY + dy };
+      })(),
     }));
-  }, [nodes, size.h, size.w]);
-
-  const edges = useMemo(() => {
-    // Connect each node to its nearest neighbor (proximity graph).
-    const out: Array<{ a: string; b: string }> = [];
-    const seen = new Set<string>();
-    for (let i = 0; i < points.length; i++) {
-      let bestJ = -1;
-      let bestD = Number.POSITIVE_INFINITY;
-      for (let j = 0; j < points.length; j++) {
-        if (i === j) continue;
-        const d = dist2(points[i], points[j]);
-        if (d < bestD) {
-          bestD = d;
-          bestJ = j;
-        }
-      }
-      if (bestJ !== -1) {
-        const a = points[i].id;
-        const b = points[bestJ].id;
-        const key = [a, b].sort().join("-");
-        if (!seen.has(key)) {
-          seen.add(key);
-          out.push({ a, b });
-        }
-      }
-    }
-    return out;
-  }, [points]);
+  }, [nodes, size.h, size.w, tMs]);
 
   const pointById = useMemo(() => {
     const m = new Map<string, { x: number; y: number }>();
@@ -123,43 +142,28 @@ export default function DroneSwarmASCII() {
 
   return (
     <div ref={wrapRef} className="relative w-full h-full">
-      <style jsx>{`
-        @keyframes swarmFloat {
-          0% {
-            transform: translate(-50%, -50%) translate3d(-2px, 1px, 0) rotate(-0.4deg)
-              scale(var(--swarm-scale));
-          }
-          50% {
-            transform: translate(-50%, -50%) translate3d(2px, -3px, 0) rotate(0.6deg)
-              scale(var(--swarm-scale));
-          }
-          100% {
-            transform: translate(-50%, -50%) translate3d(-1px, 2px, 0) rotate(-0.2deg)
-              scale(var(--swarm-scale));
-          }
-        }
-      `}</style>
-
       {/* Connector lines (behind drones) */}
       <svg
         className="absolute inset-0 w-full h-full pointer-events-none z-0"
         viewBox={`0 0 ${Math.max(1, size.w)} ${Math.max(1, size.h)}`}
         preserveAspectRatio="none"
       >
-        {edges.map((e) => {
-          const a = pointById.get(e.a);
-          const b = pointById.get(e.b);
+        {EDGES.map(([aId, bId]) => {
+          const a = pointById.get(aId);
+          const b = pointById.get(bId);
           if (!a || !b) return null;
           return (
             <line
-              key={`${e.a}-${e.b}`}
+              key={`${aId}-${bId}`}
               x1={a.x}
               y1={a.y}
               x2={b.x}
               y2={b.y}
-              stroke="var(--divider)"
-              strokeWidth={1.5}
-              opacity={0.35}
+              // Pitch black lines, always.
+              stroke="#000"
+              strokeWidth={3}
+              strokeLinecap="round"
+              opacity={1}
             />
           );
         })}
@@ -167,20 +171,37 @@ export default function DroneSwarmASCII() {
 
       {/* Nodes */}
       {nodes.map((n) => (
+        (() => {
+          const tSec = tMs / 1000;
+          const { dx, dy } = driftOffset(n, tSec);
+          return (
         <div
           key={n.id}
           className="absolute pointer-events-none select-none z-10"
           style={{
             left: `${n.xPct}%`,
             top: `${n.yPct}%`,
-            ["--swarm-scale" as any]: n.scale,
-            animation: `swarmFloat ${n.durS}s ease-in-out ${n.delayS}s infinite`,
+            transform: `translate(-50%, -50%) translate3d(${dx}px, ${dy}px, 0) scale(${n.scale})`,
           }}
         >
-          <pre className="font-mono text-[4.4px] leading-[3.9px] md:text-[6.4px] md:leading-[5.4px] text-[var(--text-primary)] opacity-75 whitespace-pre">
+          <pre
+            className="font-mono text-[var(--text-primary)] whitespace-pre"
+            style={{
+              // Fixed sizing so it doesn't "jump" on reload/breakpoint timing.
+              fontSize: "6px",
+              lineHeight: "5.2px",
+              opacity: 0.75,
+              // Mask any line passing behind the drone so it never looks "on top".
+              // Uses theme background (white in light mode, dark in dark mode).
+              textShadow:
+                "0 0 6px var(--bg-black), 0 0 10px var(--bg-black), 0 0 14px var(--bg-black)",
+            }}
+          >
             {DRONE_ASCII}
           </pre>
         </div>
+          );
+        })()
       ))}
     </div>
   );
