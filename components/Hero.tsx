@@ -1,4 +1,4 @@
-import ProfoundIsotypeASCII from './ProfoundIsotypeASCII';
+import DroneSwarmASCII from "./DroneSwarmASCII";
 
 export default function Hero() {
   return (
@@ -24,22 +24,22 @@ export default function Hero() {
           
           {/* Right border line */}
           <div className="absolute right-0 top-0 bottom-0 dotted-line" />
+
+          {/* Swarm background (full-screen) */}
+          <div className="absolute inset-0 z-0 pointer-events-none">
+            <DroneSwarmASCII />
+          </div>
           
-          {/* Overlay content - positioned higher on screen */}
-          <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-start min-h-[100vh] relative z-10 pt-16 md:pt-12 pb-8">
+          {/* Centered title/subtitle */}
+          <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-center min-h-[100vh] relative z-10 px-4">
             {/* Title (same sizing as the previous main heading) */}
-            <h1 className="text-[32px] leading-[40px] tracking-[-1.5px] md:text-[56px] md:leading-[64px] md:tracking-[-2.94px] font-medium text-[var(--text-primary)] text-center mb-6 md:mb-8 max-w-4xl px-4 md:px-0">
+            <h1 className="text-[48px] leading-[56px] tracking-[-1.5px] md:text-[84px] md:leading-[92px] md:tracking-[-2.94px] font-medium text-[var(--text-primary)] text-center mb-6 md:mb-8 max-w-4xl px-4 md:px-0">
               AeroHive
             </h1>
-
-            {/* ASCII drone */}
-            <div className="mt-0 opacity-100">
-              <ProfoundIsotypeASCII />
-            </div>
             
             {/* Subheading */}
-            <p className="text-[22px] leading-[30px] tracking-[-0.2px] md:text-[32px] md:leading-[40px] md:tracking-[-0.6px] text-[var(--text-primary)] text-center mb-6 md:mb-10 max-w-2xl px-4 md:px-0 opacity-80">
-              Modular drones, 3D AI, Fleet autonomy
+            <p className="text-[22px] leading-[30px] tracking-[-0.2px] md:text-[32px] md:leading-[40px] md:tracking-[-0.6px] text-[var(--text-primary)] text-center max-w-2xl opacity-80">
+              Be everywhere
             </p>
           </div>
         </div>

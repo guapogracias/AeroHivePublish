@@ -21,77 +21,77 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
   // Plan (3)
   {
     label: "Plan",
-    title: "Define operational boundaries and restricted areas",
+    title: "Define operational boundaries",
     description:
-      "Set clear geographic limits for where work can and cannot happen, including exclusion zones, permissions, and areas of interest that guide all operations.",
-    imageSrc: "/images/platformoverview/spatialscope.png",
-    imageAlt: "Spatial Scope",
+      "Set clear geographic limits for where work can and cannot happen, including exclusion zones, permissions, and areas of interest that guide all operations and ensure flights stay within approved areas.",
+    imageSrc: "/images/features/1.boundaries.png",
+    imageAlt: "Define operational boundaries",
   },
   {
     label: "Plan",
-    title: "Account for real-world context like weather, terrain, and access",
+    title: "Flight plans consider real-world conditions",
     description:
-      "Incorporate environmental and operational conditions to understand feasibility, data quality, and risk before and during execution.",
-    imageSrc: "/images/platformoverview/assertregistry.png",
-    imageAlt: "Asset Registry",
+      "Incorporate environmental and operational factors such as weather, terrain, obstacles, and site access before and during execution so missions adapt to real conditions rather than ideal assumptions.",
+    imageSrc: "/images/features/2.weather.png",
+    imageAlt: "Real-world flight conditions",
   },
   {
     label: "Plan",
     title: "Design reusable missions and data-collection workflows",
     description:
-      "Create repeatable templates that define how data is collected, which sensors are used, and what rules or constraints apply, ensuring consistency across missions.",
-    imageSrc: "/images/platformoverview/missiondesign.png",
-    imageAlt: "Mission Design",
+      "Create repeatable templates that define how data is collected, which sensors are used, and what rules or constraints apply. Flight plans can be reused across locations or over time to ensure consistency and reduce setup effort.",
+    imageSrc: "/images/features/3.reusablemission.png",
+    imageAlt: "Reusable missions",
   },
   // Analyze (3)
   {
     label: "Analyze",
     title: "Detect change over time across repeated scans",
     description:
-      "Compare data from different points in time to reveal movement, growth, degradation, or other meaningful changes that would be hard to detect manually.",
-    imageSrc: "/images/platformoverview/temporalchange.png",
-    imageAlt: "Temporal Change Analysis",
+      "Compare data from different points in time to reveal movement, growth, degradation, or other changes that would be difficult to detect through manual inspection or single snapshots.",
+    imageSrc: "/images/features/4.temporalchange.png",
+    imageAlt: "Temporal change",
   },
   {
     label: "Analyze",
-    title: "Assess condition, health, and risk",
+    title: "Export flight data to machinery",
     description:
-      "Evaluate the current state of land, structures, or assets using derived indicators that highlight stress, deterioration, or potential failure.",
-    imageSrc: "/images/platformoverview/conditionintelligence.png",
-    imageAlt: "Condition Intelligence",
+      "Flight results can be exported as machine-readable prescription files that agricultural equipment can directly use. Disease zones, stress areas, and exclusion regions are converted into geofenced maps that tractors, sprayers, and other machinery can load to guide where and how work is performed. This allows insights captured from the air to translate into precise actions on the ground.",
+    imageSrc: "/images/features/5.exportXIOMSL.png",
+    imageAlt: "Export to machinery",
   },
   {
     label: "Analyze",
     title: "Maintain an inventory of assets",
     description:
-      "Assets are given persistent IDs and linked to exact locations, making it possible to locate them and see when they were last observed.",
-    imageSrc: "/images/platformoverview/operationalcontext.png",
-    imageAlt: "Operational Context",
+      "Every asset is assigned a persistent ID, allowing it to be consistently recognized across flights and over time. Users can label anything they care about and the system will continue to detect and track those assets even across repeated passovers. This makes it possible to locate assets, see when they were last observed, and understand how their condition has changed.",
+    imageSrc: "/images/features/6.permanetID.png",
+    imageAlt: "Persistent asset IDs",
   },
   // Act (3)
   {
     label: "Act",
-    title: "Generate and prioritize recommended actions",
+    title: "Set drone schedules to operate without oversight",
     description:
-      "Translate insights into clear, location-specific actions such as inspections, maintenance, or follow-ups, ranked by urgency and impact.",
-    imageSrc: "/images/platformoverview/actionplanning.png",
-    imageAlt: "Action Planning",
+      "Schedule missions to run automatically at defined intervals or trigger conditions, reducing the need for constant manual control while ensuring coverage happens reliably and on time.",
+    imageSrc: "/images/features/7.setschedule.png",
+    imageAlt: "Automated scheduling",
   },
   {
     label: "Act",
-    title: "Learn from outcomes to improve future decisions and plans",
+    title: "Generated maps are simulated to find the optimal routes",
     description:
-      "Use results and feedback from completed actions to refine recommendations, improve planning, and continuously improve performance over time.",
-    imageSrc: "/images/platformoverview/executionmanagement.png",
-    imageAlt: "Execution Management",
+      "Generated maps and task plans are simulated in advance to determine the most efficient and feasible routes, minimizing overlap, avoiding restricted areas, and reducing time and resource usage.",
+    imageSrc: "/images/features/8.learning.png",
+    imageAlt: "Route simulation",
   },
   {
     label: "Act",
     title: "Compliance & Reporting",
     description:
-      "Generate regulatory, operational, and client-facing documentation including flight logs, audit records, and inspection reports.",
-    imageSrc: "/images/platformoverview/compliancereporting.png",
-    imageAlt: "Compliance & Reporting",
+      "Automatically generate regulatory, operational, and client-facing documentation including flight logs, audit records, inspection reports, and historical summaries to support transparency, accountability, and compliance.",
+    imageSrc: "/images/features/9.compliance.png",
+    imageAlt: "Compliance and reporting",
   },
 ];
 
