@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# large 3D assets (keep only the optimized version we actually use)
+public/models/silver_maple*.glb
+!public/models/silver_maple-optimized.glb
+
 # debug
 npm-debug.log*
 yarn-debug.log*
