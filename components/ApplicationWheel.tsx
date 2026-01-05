@@ -10,6 +10,17 @@ type WheelNode = {
   /** Image used to texture the wedge. */
   imageSrc?: string;
   imageAlt?: string;
+  /** Optional body copy for this node. */
+  body?: string;
+  /** Media configuration; supports image or video (uses poster/first frame for fill). */
+  media?: {
+    type: "image" | "video";
+    src: string; // for video, this is the video URL; for image, the image URL.
+    poster?: string; // used for video preview; if absent, falls back to src.
+    alt?: string;
+  };
+  /** When true, this segment is disabled and shows a "Coming Soon" overlay. */
+  disabled?: boolean;
 };
 
 // Placeholder structure — replace labels/counts with your real application taxonomy.
@@ -19,8 +30,8 @@ const DEFAULT_TREE: WheelNode = {
   children: [
     {
       id: "seg-1",
-      label: "Segment 1",
-      imageSrc: "/images/platformoverview/spatialscope.png",
+      label: "Agriculture",
+      imageSrc: "/images/applicationwheel/parentwheel/agriculture.png",
       children: [
         { id: "seg-1-a", label: "Child A", imageSrc: "/images/platformoverview/temporalchange.png" },
         { id: "seg-1-b", label: "Child B", imageSrc: "/images/platformoverview/conditionintelligence.png" },
@@ -31,6 +42,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-2",
       label: "Segment 2",
       imageSrc: "/images/platformoverview/assertregistry.png",
+      disabled: true,
       children: [
         { id: "seg-2-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
         { id: "seg-2-b", label: "Child B", imageSrc: "/images/platformoverview/executionmanagement.png" },
@@ -43,6 +55,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-3",
       label: "Segment 3",
       imageSrc: "/images/platformoverview/missiondesign.png",
+      disabled: true,
       children: [
         { id: "seg-3-a", label: "Child A", imageSrc: "/images/platformoverview/temporalchange.png" },
         { id: "seg-3-b", label: "Child B", imageSrc: "/images/platformoverview/conditionintelligence.png" },
@@ -54,6 +67,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-4",
       label: "Segment 4",
       imageSrc: "/images/platformoverview/temporalchange.png",
+      disabled: true,
       children: [
         { id: "seg-4-a", label: "Child A", imageSrc: "/images/platformoverview/spatialscope.png" },
         { id: "seg-4-b", label: "Child B", imageSrc: "/images/platformoverview/missiondesign.png" },
@@ -63,6 +77,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-5",
       label: "Segment 5",
       imageSrc: "/images/platformoverview/conditionintelligence.png",
+      disabled: true,
       children: [
         { id: "seg-5-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
         { id: "seg-5-b", label: "Child B", imageSrc: "/images/platformoverview/executionmanagement.png" },
@@ -76,6 +91,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-6",
       label: "Segment 6",
       imageSrc: "/images/platformoverview/operationalcontext.png",
+      disabled: true,
       children: [
         { id: "seg-6-a", label: "Child A", imageSrc: "/images/platformoverview/missiondesign.png" },
         { id: "seg-6-b", label: "Child B", imageSrc: "/images/platformoverview/spatialscope.png" },
@@ -86,6 +102,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-7",
       label: "Segment 7",
       imageSrc: "/images/platformoverview/actionplanning.png",
+      disabled: true,
       children: [
         { id: "seg-7-a", label: "Child A", imageSrc: "/images/platformoverview/executionmanagement.png" },
         { id: "seg-7-b", label: "Child B", imageSrc: "/images/platformoverview/compliancereporting.png" },
@@ -98,6 +115,7 @@ const DEFAULT_TREE: WheelNode = {
       id: "seg-8",
       label: "Segment 8",
       imageSrc: "/images/platformoverview/executionmanagement.png",
+      disabled: true,
       children: [
         { id: "seg-8-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
         { id: "seg-8-b", label: "Child B", imageSrc: "/images/platformoverview/missiondesign.png" },
@@ -221,17 +239,28 @@ export default function ApplicationWheel({
             aria-label="Application navigation wheel"
           >
             <defs>
-              {segments.map((seg) => (
+              {segments.map((seg) => {
+                // Choose an image to use for the pattern (supports media.image or media.video via poster).
+                const patternSrc =
+                  seg.media?.type === "image"
+                    ? seg.media.src
+                    : seg.media?.type === "video"
+                      ? seg.media.poster || seg.media.src
+                      : seg.imageSrc;
+
+                return (
                 <pattern
                   key={`pat-${seg.id}`}
                   id={`pat-${seg.id}`}
                   patternUnits="objectBoundingBox"
+                  patternContentUnits="objectBoundingBox"
                   width="1"
                   height="1"
                 >
-                  {seg.imageSrc ? (
+                  {patternSrc ? (
                     <image
-                      href={seg.imageSrc}
+                      href={patternSrc}
+                      xlinkHref={patternSrc}
                       x="0"
                       y="0"
                       width="1"
@@ -242,7 +271,8 @@ export default function ApplicationWheel({
                     <rect x="0" y="0" width="1" height="1" fill="var(--wheel-fill)" />
                   )}
                 </pattern>
-              ))}
+              );
+              })}
             </defs>
 
             {/* Ring segments */}
@@ -252,6 +282,11 @@ export default function ApplicationWheel({
               const full = (Math.PI * 2) / n;
               const start = i * full + gap / 2 - Math.PI / 2;
               const end = (i + 1) * full - gap / 2 - Math.PI / 2;
+              const mid = (start + end) / 2;
+              const midR = (geometry.rOuter + geometry.rInner) / 2;
+              // Round to avoid SSR/CSR float drift that can cause hydration mismatches.
+              const labelX = Number(fmt(geometry.cx + midR * Math.cos(mid)));
+              const labelY = Number(fmt(geometry.cy + midR * Math.sin(mid)));
 
               const d = donutWedgePath({
                 cx: geometry.cx,
@@ -263,22 +298,62 @@ export default function ApplicationWheel({
               });
 
               const isHovered = hoveredId === seg.id;
-              const isClickable = !!(seg.children && seg.children.length > 0);
+              const isDisabled = !!seg.disabled;
+              const isClickable = !isDisabled && !!(seg.children && seg.children.length > 0);
 
               return (
-                <path
-                  key={seg.id}
-                  d={d}
-                  fill={seg.imageSrc ? `url(#pat-${seg.id})` : "var(--wheel-fill)"}
-                  stroke="var(--wheel-stroke)"
-                  strokeWidth={isHovered ? 3 : 2}
-                  strokeLinejoin="round"
-                  paintOrder="stroke"
-                  style={{ cursor: isClickable ? "pointer" : "default" }}
-                  onMouseEnter={() => setHoveredId(seg.id)}
-                  onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => onSegmentClick(seg)}
-                />
+                <g key={seg.id}>
+                  <path
+                    d={d}
+                    fill={
+                      isDisabled
+                        ? "rgba(0,0,0,0.08)"
+                        : seg.imageSrc
+                          ? `url(#pat-${seg.id})`
+                          : "var(--wheel-fill)"
+                    }
+                    stroke="var(--wheel-stroke)"
+                    strokeWidth={isHovered && !seg.disabled ? 3 : 2}
+                    strokeLinejoin="round"
+                    paintOrder="stroke"
+                    style={{ cursor: isClickable ? "pointer" : "default" }}
+                    onMouseEnter={() => setHoveredId(seg.id)}
+                    onMouseLeave={() => setHoveredId(null)}
+                    onClick={() => {
+                      if (!seg.disabled) onSegmentClick(seg);
+                    }}
+                    opacity={isDisabled ? 0.9 : 1}
+                  />
+                  {isDisabled ? (
+                    <text
+                      x={labelX}
+                      y={labelY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize="18"
+                      fontWeight={700}
+                      fill="#000"
+                      transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
+                    >
+                      Coming Soon
+                    </text>
+                  ) : (
+                    <text
+                      x={labelX}
+                      y={labelY}
+                      textAnchor="middle"
+                      dominantBaseline="middle"
+                      fontSize="18"
+                      fontWeight={800}
+                      fill="#fff"
+                      stroke="rgba(0,0,0,0.45)"
+                      strokeWidth="0.8"
+                      transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
+                    >
+                      {seg.label}
+                    </text>
+                  )}
+                </g>
               );
             })}
 
@@ -332,18 +407,28 @@ export default function ApplicationWheel({
           </svg>
         </div>
 
-        {/* Optional: label list for accessibility and quick testing */}
+            {/* Optional: label list for accessibility and quick testing */}
         <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-2">
           {segments.map((seg) => (
             <button
               key={`${node.id}-${seg.id}`}
               type="button"
-              onClick={() => onSegmentClick(seg)}
+              onClick={() => {
+                if (!seg.disabled) onSegmentClick(seg);
+              }}
               className="text-left rounded-lg border border-[var(--divider)] bg-white/5 px-3 py-2 text-body-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              style={{
+                opacity: seg.disabled ? 0.5 : 1,
+                cursor: seg.disabled ? "default" : "pointer",
+              }}
+              disabled={seg.disabled}
             >
               {seg.label}
               {seg.children?.length ? (
                 <span className="text-[var(--text-muted)]">{" "}({seg.children.length})</span>
+              ) : null}
+              {seg.disabled ? (
+                <span className="block text-[var(--text-muted)]">Coming Soon</span>
               ) : null}
             </button>
           ))}

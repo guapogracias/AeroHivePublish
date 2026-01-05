@@ -1,6 +1,5 @@
 import Hero from '@/components/Hero';
 import Mission from '@/components/Mission';
-import EdgeValues from '@/components/EdgeValues';
 import ScrollShowcase from '@/components/ScrollShowcase';
 import OverviewInsert from '@/components/OverviewInsert';
 
@@ -11,7 +10,6 @@ export default function OverviewPage() {
       <Mission />
       <OverviewInsert />
       <ScrollShowcase />
-      <EdgeValues />
     </main>
   );
 }
