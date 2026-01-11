@@ -3,37 +3,15 @@
 import { useEffect, useRef, useState, Suspense, useMemo } from "react";
 import type { LucideIcon } from "lucide-react";
 import { Satellite, Plane, Boxes, Tractor } from "lucide-react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { useDroneSwarm } from "./useDroneSwarm";
+import SectionBlock from "@/components/SectionBlock";
+import { Section, isComponentSection } from "@/types/sections";
+import dynamic from "next/dynamic";
 
-const SYSTEM_PRESETS = [
-  {
-    layer: "PX4",
-    title: "PX4",
-    body: "Natural Language Control: describe missions in any language; converted to drone-ready commands via PX4 for safe, compliant ops.",
-    camera: { position: [1, 1.5, 2] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
-  },
-  {
-    layer: "Jetson",
-    title: "Jetson",
-    body: "Coordinated & Scalable Operations: onboard coordination/decision-making for multi-drone coverage without overlap.",
-    camera: { position: [0.5, 2, 1.5] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
-  },
-  {
-    layer: "camera",
-    title: "Camera System",
-    body: "Camera & Sensing Framework: real-time CV recognizes user-defined objects trained from examples or datasets.",
-    camera: { position: [1.5, 0.5, 2] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
-  },
-  {
-    layer: "LiDAR",
-    title: "LiDAR",
-    body: "Autonomous Decision Making: onboard AI adapts to changing conditions, avoids obstacles, and optimizes paths.",
-    camera: { position: [2, 1, 1.5] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
-  },
-];
+const DroneModel3D = dynamic(() => import("@/components/DroneModel"), { ssr: false });
 
 interface Layer {
   id: number;
@@ -45,6 +23,104 @@ interface Layer {
   bgColor: string;
   centerImage: string;
 }
+
+const CAMERA_PRESETS: Record<string, { position: [number, number, number]; lookAt: [number, number, number]; fov: number }> = {
+  PX4: { position: [1, 1.5, 2], lookAt: [0, 0.1, 0], fov: 50 },
+  Jetson: { position: [0.5, 2, 1.5], lookAt: [0, 0.1, 0], fov: 50 },
+  camera: { position: [1.5, 0.5, 2], lookAt: [0, 0.1, 0], fov: 50 },
+  LiDAR: { position: [2, 1, 1.5], lookAt: [0, 0.1, 0], fov: 50 },
+};
+
+const systemSections: Section[] = [
+  {
+    id: "section-01",
+    type: "content",
+    caption: "Section 01",
+    title: "Natural Language Control",
+    content:
+      "Users can describe missions in any language, and those instructions are converted into drone-ready commands using PX4, ensuring safe and regulation-compliant operation. The system connects user intent directly to flight behavior without manual configuration. This makes complex missions easy to launch and repeat.",
+  },
+  {
+    id: "component-01",
+    type: "component",
+    caption: "Component 01",
+    title: "PX4",
+    content: "",
+    layerName: "PX4",
+    media: { type: "video", src: "/videos/PX4.mp4" },
+    cameraConfig: {
+      position: [1, 1.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 2,
+    },
+  },
+  {
+    id: "section-02",
+    type: "content",
+    caption: "Section 02",
+    title: "Coordinated & Scalable Operations",
+    content:
+      "Flight paths are automatically planned to maximize coverage while adapting drone formations to the task. Jetson Nano enables onboard coordination and decision-making, allowing multiple drones to operate together efficiently without overlap. This architecture scales smoothly from small deployments to large-area operations.",
+  },
+  {
+    id: "component-02",
+    type: "component",
+    caption: "Component 02",
+    title: "Jetson",
+    content: "",
+    layerName: "Jetson",
+    media: { type: "video", src: "/videos/Jetson.mp4" },
+    cameraConfig: {
+      position: [0.5, 2, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+  {
+    id: "section-03",
+    type: "content",
+    caption: "Section 03",
+    title: "Camera & Sensing Framework",
+    content:
+      "Using computer vision, the system processes camera data in real time to recognize user-defined objects trained from example images or online datasets. This allows drones to detect and focus on specific targets or features during flight. Recognition improves as more labeled data is added over time.",
+  },
+  {
+    id: "component-03",
+    type: "component",
+    caption: "Component 03",
+    title: "Camera System",
+    content: "",
+    layerName: "camera",
+    media: { type: "video", src: "/videos/CV.mp4" },
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  {
+    id: "section-04",
+    type: "content",
+    caption: "Section 04",
+    title: "Autonomous Decision Making",
+    content:
+      "The onboard AI processes environmental data to make real-time decisions during flight. Drones can adapt to changing conditions, avoid obstacles, and optimize their paths without human intervention. This enables truly autonomous operations in dynamic and unpredictable environments.",
+  },
+  {
+    id: "component-04",
+    type: "component",
+    caption: "Component 04",
+    title: "LiDAR",
+    content: "",
+    layerName: "LiDAR",
+    media: { type: "video", src: "/videos/LiDAR.webm" },
+    cameraConfig: {
+      position: [2, 1, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+];
 
 const layers: Layer[] = [
   {
@@ -89,6 +165,13 @@ const layers: Layer[] = [
   },
 ];
 
+const GROUND_LAYOUT = {
+  y: -0.02, // sinks the wheels slightly into the soil plane
+  // Angles are in radians; tweak yaw for heading, pitch for tilt toward/away camera, roll to lean.
+  tractor: { screenX: 0.42, screenY: 0.37, yaw: 3.23, pitch: -0.06, roll: -0.02 },
+  excavator: { screenX: 0.32, screenY: 0.6, yaw: 1.29, pitch: -0.04, roll: -0.01 },
+};
+
 export function EarthScroll() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [currentLayer, setCurrentLayer] = useState(0);
@@ -96,9 +179,21 @@ export function EarthScroll() {
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const [focusStage, setFocusStage] = useState<"idle" | "focusing" | "pinned">("idle");
   const camRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const [activePresetIdx, setActivePresetIdx] = useState(0);
-  const activePreset =
-    currentLayer === 2 && focusStage !== "idle" ? SYSTEM_PRESETS[activePresetIdx] : null;
+  const [currentSystemIndex, setCurrentSystemIndex] = useState(0);
+  const currentSystemSection = systemSections[currentSystemIndex];
+  const [suppressFocus, setSuppressFocus] = useState(false);
+  const lastWheelRef = useRef(0);
+  const activeCameraPreset =
+    currentLayer === 2 &&
+    focusStage !== "idle" &&
+    currentSystemSection &&
+    isComponentSection(currentSystemSection)
+      ? {
+          position: currentSystemSection.cameraConfig.position,
+          lookAt: currentSystemSection.cameraConfig.lookAtOffset ?? [0, 0, 0],
+          fov: 50,
+        }
+      : null;
 
   useEffect(() => {
     let ticking = false;
@@ -143,16 +238,23 @@ export function EarthScroll() {
       }
       return;
     }
-    if (focusStage === "idle" && scrollProgress > 75) {
+    if (!suppressFocus && focusStage === "idle" && scrollProgress > 75) {
       setFocusedIndex(0);
       setFocusStage("focusing");
     }
-  }, [focusStage, scrollProgress, currentLayer]);
+  }, [focusStage, scrollProgress, currentLayer, suppressFocus]);
 
-  // Reset preset index when entering focus
+  // Allow re-focus after user exits once they scroll back above the threshold
+  useEffect(() => {
+    if (suppressFocus && scrollProgress < 60) {
+      setSuppressFocus(false);
+    }
+  }, [scrollProgress, suppressFocus]);
+
+  // Reset system index when entering focus
   useEffect(() => {
     if (focusStage === "focusing") {
-      setActivePresetIdx(0);
+      setCurrentSystemIndex(0);
     }
   }, [focusStage]);
 
@@ -161,14 +263,35 @@ export function EarthScroll() {
     if (currentLayer !== 2 || focusStage === "idle") return;
     const handleWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaY) < 5) return;
-      setActivePresetIdx((idx) => {
+      const now = performance.now();
+      if (now - lastWheelRef.current < 600) return; // throttle rapid switching
+      lastWheelRef.current = now;
+      const isLast = currentSystemIndex === systemSections.length - 1;
+      const isFirst = currentSystemIndex === 0;
+      if (e.deltaY > 0 && isLast) {
+        // advance to ground layer and reset focus
+        setCurrentLayer(3);
+        setFocusStage("idle");
+        setFocusedIndex(null);
+        setCurrentSystemIndex(0);
+        setSuppressFocus(true);
+        return;
+      }
+      if (e.deltaY < 0 && isFirst) {
+        // exit back to swarm
+        setFocusStage("idle");
+        setFocusedIndex(null);
+        setSuppressFocus(true);
+        return;
+      }
+      setCurrentSystemIndex((idx) => {
         const next = e.deltaY > 0 ? idx + 1 : idx - 1;
-        return Math.min(Math.max(next, 0), SYSTEM_PRESETS.length - 1);
+        return Math.min(Math.max(next, 0), systemSections.length - 1);
       });
     };
     window.addEventListener("wheel", handleWheel, { passive: true });
     return () => window.removeEventListener("wheel", handleWheel);
-  }, [currentLayer, focusStage]);
+  }, [currentLayer, focusStage, currentSystemIndex]);
 
   const layer = layers[currentLayer];
   const CurrentIcon = layer.icon;
@@ -207,38 +330,89 @@ export function EarthScroll() {
         })}
 
         {/* Center 3D models per layer */}
-        <div className="absolute inset-0 pointer-events-none" key={currentLayer}>
-          <Canvas
-            camera={{ position: [0, 0.8, 4], fov: 45 }}
-            gl={{ antialias: true, alpha: true }}
-            onCreated={({ gl, camera }) => {
-              gl.setClearColor(0x000000, 0);
-              camRef.current = camera as THREE.PerspectiveCamera;
-            }}
-            className="w-full h-full"
-          >
-            <CameraLerper
-              camRef={camRef}
-              focusStage={focusStage}
-              active={currentLayer === 2}
-              activePreset={activePreset}
-              onArrive={() => {
-                if (focusStage === "focusing") setFocusStage("pinned");
+        {currentLayer === 2 && focusStage !== "idle" ? (
+          <>
+            <div className="absolute inset-0">
+              <DroneModel3D
+                focusLayer={
+                  currentSystemSection && isComponentSection(currentSystemSection)
+                    ? currentSystemSection.layerName
+                    : null
+                }
+              />
+            </div>
+            {currentSystemSection && (
+              <div className="absolute bottom-[8%] left-[4%] md:left-[5%] z-30 w-[90%] md:w-[35%] max-w-[450px] pointer-events-auto">
+                <div className="bg-[var(--bg-black)]/80 backdrop-blur-md rounded-lg p-6 md:p-8 border border-[var(--divider)]">
+                  {(() => {
+                    const isLast = currentSystemIndex === systemSections.length - 1;
+                    const isFirst = currentSystemIndex === 0;
+                    return (
+                    <SectionBlock
+                      key={currentSystemSection.id}
+                      caption={currentSystemSection.caption}
+                      title={currentSystemSection.title}
+                      content={currentSystemSection.content}
+                      media={isComponentSection(currentSystemSection) ? currentSystemSection.media : undefined}
+                      onBack={() => {
+                        if (!isFirst) {
+                          setCurrentSystemIndex((i) => Math.max(i - 1, 0));
+                        } else {
+                          setFocusStage("idle");
+                          setFocusedIndex(null);
+                          setSuppressFocus(true);
+                        }
+                      }}
+                      onNext={() => {
+                        if (!isLast) {
+                          setCurrentSystemIndex((i) => Math.min(i + 1, systemSections.length - 1));
+                        } else {
+                          // advance to ground layer and reset focus
+                          setCurrentLayer(3);
+                          setFocusStage("idle");
+                          setFocusedIndex(null);
+                          setCurrentSystemIndex(0);
+                          setSuppressFocus(true);
+                        }
+                      }}
+                      canGoBack={true}
+                      canGoNext={true}
+                    />
+                    );
+                  })()}
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 pointer-events-none" key={currentLayer}>
+            <Canvas
+              camera={{ position: [0, 0.8, 4], fov: 45 }}
+              gl={{ antialias: true, alpha: true }}
+              onCreated={({ gl, camera }) => {
+                gl.setClearColor(0x000000, 0);
+                camRef.current = camera as THREE.PerspectiveCamera;
               }}
-            />
-            <ambientLight intensity={1.1} />
-            <directionalLight position={[3, 5, 3]} intensity={1.2} />
-            <Suspense fallback={null}>
-              <LayerScene layerId={layer.id} focusedIndex={focusedIndex} focusStage={focusStage} />
-            </Suspense>
-            <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
-          </Canvas>
-          <SystemOverlayLite
-            visible={currentLayer === 2 && focusStage === "pinned" && !!activePreset}
-            title={activePreset?.title}
-            body={activePreset?.body}
-          />
-        </div>
+              className="w-full h-full"
+            >
+              <CameraLerper
+                camRef={camRef}
+                focusStage={focusStage}
+                active={currentLayer === 2}
+                activePreset={activeCameraPreset}
+                onArrive={() => {
+                  if (focusStage === "focusing") setFocusStage("pinned");
+                }}
+              />
+              <ambientLight intensity={1.1} />
+              <directionalLight position={[3, 5, 3]} intensity={1.2} />
+              <Suspense fallback={null}>
+                <LayerScene layerId={layer.id} focusedIndex={focusedIndex} focusStage={focusStage} />
+              </Suspense>
+              <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
+            </Canvas>
+          </div>
+        )}
 
         {/* Layer Indicator - Right Side */}
         <div className="absolute right-8 top-1/2 -translate-y-1/2 z-20">
@@ -322,14 +496,90 @@ export function EarthScroll() {
 
 function SatelliteModel() {
   const { scene } = useGLTF("/models/satellite-optimized.glb");
-  // 300% larger than before (0.5 → 1.5).
-  return <primitive object={scene} scale={1.5} rotation={[0.2, Math.PI / 4, 3]} />;
+  return <primitive object={scene} scale={1.5} />;
+}
+
+const SAT_ORBIT = {
+  radius: 0.8,
+  height: 0.35,
+  speed: 0, // pinned position
+  baseAngle: -1.25, // controls where it sits around Earth
+  spinSpeed: 0.80, // blade-like roll around the look axis
+};
+
+function SatelliteOrbit() {
+  const ref = useRef<THREE.Group>(null);
+  const tOrbitRef = useRef(0);
+  const tSpinRef = useRef(0);
+  const up = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const target = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+  const m4 = useMemo(() => new THREE.Matrix4(), []);
+  // Spin around the panel axis (local Y) so the wings rotate without changing the dish aim.
+  const spinAxisLocal = useMemo(() => new THREE.Vector3(0, 1, 0), []);
+  const forwardLocal = useMemo(() => new THREE.Vector3(0, 0, -1), []);
+  const spinAxisWorld = useMemo(() => new THREE.Vector3(), []);
+  const flipQuat = useMemo(() => new THREE.Quaternion(), []);
+  const spinQuat = useMemo(() => new THREE.Quaternion(), []);
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    tOrbitRef.current += delta * SAT_ORBIT.speed;
+    tSpinRef.current += delta * SAT_ORBIT.spinSpeed;
+    const angle = SAT_ORBIT.baseAngle + tOrbitRef.current;
+
+    const x = Math.cos(angle) * SAT_ORBIT.radius;
+    const z = Math.sin(angle) * SAT_ORBIT.radius;
+    const y = SAT_ORBIT.height;
+
+    ref.current.position.set(x, y, z);
+
+    // Look at Earth center, then apply the model's base offset.
+    m4.lookAt(ref.current.position, target, up);
+    const lookQuat = new THREE.Quaternion().setFromRotationMatrix(m4);
+
+    // Flip the model 180° around the forward axis so it faces the opposite way while still aiming at Earth.
+    const forwardAxisWorld = forwardLocal.clone().applyQuaternion(lookQuat).normalize();
+    flipQuat.setFromAxisAngle(forwardAxisWorld, Math.PI);
+    const baseQuat = flipQuat.clone().multiply(lookQuat);
+
+    // Spin around the panel axis (local Y) after the flip so blades rotate correctly.
+    spinAxisWorld.copy(spinAxisLocal).applyQuaternion(baseQuat).normalize();
+    spinQuat.setFromAxisAngle(spinAxisWorld, tSpinRef.current);
+
+    ref.current.quaternion.copy(spinQuat.multiply(baseQuat));
+  });
+
+  return (
+    <group ref={ref}>
+      <SatelliteModel />
+    </group>
+  );
 }
 
 function CropDusterModel() {
   const { scene } = useGLTF("/models/crop_duster-optimized.glb");
   // Further reduced (~20% more → 0.308) and pitched to show more of the top.
   return <primitive object={scene} scale={0.2} rotation={[1.3, -Math.PI / 9, 0]} position={[0, 0.1, 0]} />;
+}
+
+function CropDusterFlight() {
+  const ref = useRef<THREE.Group>(null);
+  const tRef = useRef(0);
+
+  useFrame((_, delta) => {
+    if (!ref.current) return;
+    // Slow forward drift with a gentle lateral sway; loop to keep it on screen.
+    tRef.current = (tRef.current + delta * 0.22) % 8;
+    const x = 1.2 - tRef.current * 0.35; // move left across the frame
+    const z = Math.sin(tRef.current * 0.6) * 0.35; // slight weaving
+    ref.current.position.set(x, 0.1, z);
+  });
+
+  return (
+    <group ref={ref}>
+      <CropDusterModel />
+    </group>
+  );
 }
 
 function DroneModel({ position = [0, 0, 0] as [number, number, number] }) {
@@ -343,13 +593,87 @@ function DroneModel({ position = [0, 0, 0] as [number, number, number] }) {
 function TractorModel() {
   const { scene } = useGLTF("/models/tractor-optimized.glb");
   // Slightly smaller (0.7 * 0.95 ≈ 0.665) to sit behind the excavator without overlap.
-  return <primitive object={scene} scale={0.004} rotation={[0, 0, 0]} position={[0.7, 0, 0]} />;
+  return <primitive object={scene} scale={0.0043} rotation={[0, 0, 0]} position={[0.7, 0, 0]} />;
 }
 
 function ExcavatorModel() {
   const { scene } = useGLTF("/models/excavator_cat-optimized.glb");
   // Larger by +0.3 (0.7 -> 1.0) to better match the tractor size.
-  return <primitive object={scene} scale={15.0} rotation={[0, 0, 0]} position={[-0.3, 0, 0]} />;
+  return <primitive object={scene} scale={19.0} rotation={[0, 0, 0]} position={[-0.3, 0, 0]} />;
+}
+
+function groundAnchorFromScreen(camera: THREE.PerspectiveCamera, screenX: number, screenY: number, groundY: number) {
+  const ndc = new THREE.Vector3(screenX * 2 - 1, -(screenY * 2 - 1), 0.5);
+  const origin = camera.position.clone();
+  const direction = ndc.unproject(camera).sub(origin).normalize();
+  const dirY = Math.abs(direction.y) < 1e-4 ? (direction.y < 0 ? -1e-4 : 1e-4) : direction.y;
+  const distance = (groundY - origin.y) / dirY;
+  return origin.add(direction.multiplyScalar(distance));
+}
+
+function GroundVehicles() {
+  const { camera } = useThree();
+  const excavatorRef = useRef<THREE.Group>(null);
+  const tractorRef = useRef<THREE.Group>(null);
+  const timeRef = useRef(0);
+
+  // Animate a subtle yaw swivel for digging; keep tractor static.
+  useFrame((_, delta) => {
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+    timeRef.current += delta;
+
+    const excavatorPos = groundAnchorFromScreen(
+      camera,
+      GROUND_LAYOUT.excavator.screenX,
+      GROUND_LAYOUT.excavator.screenY,
+      GROUND_LAYOUT.y,
+    );
+    const tractorPos = groundAnchorFromScreen(
+      camera,
+      GROUND_LAYOUT.tractor.screenX,
+      GROUND_LAYOUT.tractor.screenY,
+      GROUND_LAYOUT.y,
+    );
+
+    if (excavatorRef.current) {
+      const baseYaw = GROUND_LAYOUT.excavator.yaw ?? 0;
+      const animYaw = baseYaw + Math.sin(timeRef.current * 1.1) * 0.06; // gentle left-right swivel
+      excavatorRef.current.position.copy(excavatorPos);
+      excavatorRef.current.rotation.set(
+        GROUND_LAYOUT.excavator.pitch ?? 0,
+        animYaw,
+        GROUND_LAYOUT.excavator.roll ?? 0,
+      );
+    }
+
+    if (tractorRef.current) {
+      tractorRef.current.position.copy(tractorPos);
+      tractorRef.current.rotation.set(
+        GROUND_LAYOUT.tractor.pitch ?? 0,
+        GROUND_LAYOUT.tractor.yaw ?? 0,
+        GROUND_LAYOUT.tractor.roll ?? 0,
+      );
+    }
+  });
+
+  // Initial placement before the first frame runs.
+  const initialExcavator = camera instanceof THREE.PerspectiveCamera
+    ? groundAnchorFromScreen(camera, GROUND_LAYOUT.excavator.screenX, GROUND_LAYOUT.excavator.screenY, GROUND_LAYOUT.y)
+    : new THREE.Vector3();
+  const initialTractor = camera instanceof THREE.PerspectiveCamera
+    ? groundAnchorFromScreen(camera, GROUND_LAYOUT.tractor.screenX, GROUND_LAYOUT.tractor.screenY, GROUND_LAYOUT.y)
+    : new THREE.Vector3();
+
+  return (
+    <>
+      <group ref={excavatorRef} position={initialExcavator}>
+        <ExcavatorModel />
+      </group>
+      <group ref={tractorRef} position={initialTractor}>
+        <TractorModel />
+      </group>
+    </>
+  );
 }
 
 function Spin({ speed = 0.25, children }: { speed?: number; children: React.ReactNode }) {
@@ -441,7 +765,7 @@ function CameraLerper({
   camRef: React.RefObject<THREE.PerspectiveCamera | null>;
   focusStage: "idle" | "focusing" | "pinned";
   active: boolean;
-  activePreset: { camera: { position: [number, number, number]; lookAt: [number, number, number]; fov: number } } | null;
+  activePreset: { position: [number, number, number]; lookAt: [number, number, number]; fov: number } | null;
   onArrive: () => void;
 }) {
   const targetRef = useMemo(() => new THREE.Vector3(0, 0, 0), []);
@@ -456,8 +780,8 @@ function CameraLerper({
       desiredPos.set(0, 0.8, 4);
       desiredLook.set(0, 0, 0);
     } else {
-      desiredPos.set(...activePreset.camera.position);
-      desiredLook.set(...activePreset.camera.lookAt);
+      desiredPos.set(...activePreset.position);
+      desiredLook.set(...activePreset.lookAt);
     }
 
     cam.position.lerp(desiredPos, 1 - Math.exp(-4 * delta));
@@ -465,7 +789,7 @@ function CameraLerper({
     cam.lookAt(targetRef);
 
     if (cam instanceof THREE.PerspectiveCamera && activePreset) {
-      cam.fov += (activePreset.camera.fov - cam.fov) * (1 - Math.exp(-4 * delta));
+      cam.fov += (activePreset.fov - cam.fov) * (1 - Math.exp(-4 * delta));
       cam.updateProjectionMatrix();
     }
 
@@ -488,29 +812,15 @@ function LayerScene({
 }) {
   switch (layerId) {
     case 1:
-      return (
-        <Spin speed={0.2}>
-          <SatelliteModel />
-        </Spin>
-      );
+      return <SatelliteOrbit />;
     case 2:
-      return (
-        // No spin for the plane; show it stable, top-leaning angle.
-        <CropDusterModel />
-      );
+      return <CropDusterFlight />;
     case 3:
       return <DronesScene focusedIndex={focusedIndex} focusStage={focusStage} />;
     case 4:
     default:
       return (
-        <>
-          <Spin speed={0.2}>
-            <ExcavatorModel />
-          </Spin>
-          <Spin speed={0.18}>
-            <TractorModel />
-          </Spin>
-        </>
+        <GroundVehicles />
       );
   }
 }
