@@ -5,7 +5,35 @@ import type { LucideIcon } from "lucide-react";
 import { Satellite, Plane, Boxes, Tractor } from "lucide-react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useDroneSwarm } from "./useDroneSwarm";
+
+const SYSTEM_PRESETS = [
+  {
+    layer: "PX4",
+    title: "PX4",
+    body: "Natural Language Control: describe missions in any language; converted to drone-ready commands via PX4 for safe, compliant ops.",
+    camera: { position: [1, 1.5, 2] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
+  },
+  {
+    layer: "Jetson",
+    title: "Jetson",
+    body: "Coordinated & Scalable Operations: onboard coordination/decision-making for multi-drone coverage without overlap.",
+    camera: { position: [0.5, 2, 1.5] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
+  },
+  {
+    layer: "camera",
+    title: "Camera System",
+    body: "Camera & Sensing Framework: real-time CV recognizes user-defined objects trained from examples or datasets.",
+    camera: { position: [1.5, 0.5, 2] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
+  },
+  {
+    layer: "LiDAR",
+    title: "LiDAR",
+    body: "Autonomous Decision Making: onboard AI adapts to changing conditions, avoids obstacles, and optimizes paths.",
+    camera: { position: [2, 1, 1.5] as [number, number, number], lookAt: [0, 0.1, 0] as [number, number, number], fov: 50 },
+  },
+];
 
 interface Layer {
   id: number;
@@ -65,6 +93,12 @@ export function EarthScroll() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [currentLayer, setCurrentLayer] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
+  const [focusStage, setFocusStage] = useState<"idle" | "focusing" | "pinned">("idle");
+  const camRef = useRef<THREE.PerspectiveCamera | null>(null);
+  const [activePresetIdx, setActivePresetIdx] = useState(0);
+  const activePreset =
+    currentLayer === 2 && focusStage !== "idle" ? SYSTEM_PRESETS[activePresetIdx] : null;
 
   useEffect(() => {
     let ticking = false;
@@ -99,6 +133,43 @@ export function EarthScroll() {
     };
   }, []);
 
+  // Trigger focus when scrolling past 75% of this section
+  useEffect(() => {
+    // Only trigger focus while on the Drones layer (index 2) and past 75% scroll of the section.
+    if (currentLayer !== 2) {
+      if (focusStage !== "idle") {
+        setFocusedIndex(null);
+        setFocusStage("idle");
+      }
+      return;
+    }
+    if (focusStage === "idle" && scrollProgress > 75) {
+      setFocusedIndex(0);
+      setFocusStage("focusing");
+    }
+  }, [focusStage, scrollProgress, currentLayer]);
+
+  // Reset preset index when entering focus
+  useEffect(() => {
+    if (focusStage === "focusing") {
+      setActivePresetIdx(0);
+    }
+  }, [focusStage]);
+
+  // Scroll wheel to cycle presets when pinned/focusing on drones layer
+  useEffect(() => {
+    if (currentLayer !== 2 || focusStage === "idle") return;
+    const handleWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 5) return;
+      setActivePresetIdx((idx) => {
+        const next = e.deltaY > 0 ? idx + 1 : idx - 1;
+        return Math.min(Math.max(next, 0), SYSTEM_PRESETS.length - 1);
+      });
+    };
+    window.addEventListener("wheel", handleWheel, { passive: true });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, [currentLayer, focusStage]);
+
   const layer = layers[currentLayer];
   const CurrentIcon = layer.icon;
 
@@ -129,36 +200,44 @@ export function EarthScroll() {
                   : isFuture
                     ? "scale(0.9) translateY(30%)"
                     : "scale(1) translateY(0)",
-                filter: isActive ? "brightness(0.78)" : "brightness(0.55)",
+                filter: "none",
               }}
             />
           );
         })}
-
-        {/* Color Overlay */}
-        <div
-          className="absolute inset-0 transition-all duration-700"
-          style={{
-            backgroundColor: layer.bgColor,
-            opacity: 0.35,
-          }}
-        />
 
         {/* Center 3D models per layer */}
         <div className="absolute inset-0 pointer-events-none" key={currentLayer}>
           <Canvas
             camera={{ position: [0, 0.8, 4], fov: 45 }}
             gl={{ antialias: true, alpha: true }}
-            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+            onCreated={({ gl, camera }) => {
+              gl.setClearColor(0x000000, 0);
+              camRef.current = camera as THREE.PerspectiveCamera;
+            }}
             className="w-full h-full"
           >
+            <CameraLerper
+              camRef={camRef}
+              focusStage={focusStage}
+              active={currentLayer === 2}
+              activePreset={activePreset}
+              onArrive={() => {
+                if (focusStage === "focusing") setFocusStage("pinned");
+              }}
+            />
             <ambientLight intensity={1.1} />
             <directionalLight position={[3, 5, 3]} intensity={1.2} />
             <Suspense fallback={null}>
-              <LayerScene layerId={layer.id} />
+              <LayerScene layerId={layer.id} focusedIndex={focusedIndex} focusStage={focusStage} />
             </Suspense>
             <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
           </Canvas>
+          <SystemOverlayLite
+            visible={currentLayer === 2 && focusStage === "pinned" && !!activePreset}
+            title={activePreset?.title}
+            body={activePreset?.body}
+          />
         </div>
 
         {/* Layer Indicator - Right Side */}
@@ -244,7 +323,7 @@ export function EarthScroll() {
 function SatelliteModel() {
   const { scene } = useGLTF("/models/satellite-optimized.glb");
   // 300% larger than before (0.5 → 1.5).
-  return <primitive object={scene} scale={1.5} rotation={[-3, Math.PI / 4, -0.3]} />;
+  return <primitive object={scene} scale={1.5} rotation={[0.2, Math.PI / 4, 3]} />;
 }
 
 function CropDusterModel() {
@@ -258,19 +337,19 @@ function DroneModel({ position = [0, 0, 0] as [number, number, number] }) {
   // Clone the GLTF scene so multiple instances can render simultaneously.
   const cloned = useMemo(() => scene.clone(true), [scene]);
   // Slightly larger so all three are visible at once.
-  return <primitive object={cloned} position={position} scale={0.007} rotation={[0, Math.PI / 3, 0]} />;
+  return <primitive object={cloned} position={position} scale={0.005} />;
 }
 
 function TractorModel() {
   const { scene } = useGLTF("/models/tractor-optimized.glb");
   // Slightly smaller (0.7 * 0.95 ≈ 0.665) to sit behind the excavator without overlap.
-  return <primitive object={scene} scale={0.005} rotation={[0, -Math.PI / 5, 0]} position={[0, 0, -2]} />;
+  return <primitive object={scene} scale={0.004} rotation={[0, 0, 0]} position={[0.7, 0, 0]} />;
 }
 
 function ExcavatorModel() {
   const { scene } = useGLTF("/models/excavator_cat-optimized.glb");
   // Larger by +0.3 (0.7 -> 1.0) to better match the tractor size.
-  return <primitive object={scene} scale={23.0} rotation={[0, Math.PI / 6, 0]} position={[0, 0, 2]} />;
+  return <primitive object={scene} scale={15.0} rotation={[0, 0, 0]} position={[-0.3, 0, 0]} />;
 }
 
 function Spin({ speed = 0.25, children }: { speed?: number; children: React.ReactNode }) {
@@ -281,7 +360,132 @@ function Spin({ speed = 0.25, children }: { speed?: number; children: React.Reac
   return <group ref={ref}>{children}</group>;
 }
 
-function LayerScene({ layerId }: { layerId: number }) {
+function DronesScene({
+  focusedIndex,
+  focusStage,
+}: {
+  focusedIndex: number | null;
+  focusStage: "idle" | "focusing" | "pinned";
+}) {
+  const refs: React.RefObject<THREE.Group>[] = [
+    useRef<THREE.Group>(null!),
+    useRef<THREE.Group>(null!),
+    useRef<THREE.Group>(null!),
+  ];
+
+  // Run swarm only when not focusing/pinned.
+  useDroneSwarm(refs, {
+    bounds: { minX: -2.6, maxX: 2.6, minZ: -1.8, maxZ: 1.8, yBase: 0.02, yAmp: 0.12 },
+    speed: 0.6,
+    separationRadius: 0.4,
+    separationStrength: 1.6,
+    boundaryPadding: 0.25,
+    boundaryStrength: 1.6,
+    yawFollow: 3.5,
+    scanChancePerSec: 0.16,
+    enabled: focusStage === "idle",
+  } as any);
+
+  const focusTarget = useMemo(() => new THREE.Vector3(0, 0.05, 0), []);
+
+  useFrame((_, delta) => {
+    if (focusStage === "idle" || focusedIndex === null) return;
+    refs.forEach((ref, i) => {
+      if (!ref.current) return;
+      if (i !== focusedIndex) {
+        ref.current.visible = false;
+        return;
+      }
+      ref.current.visible = true;
+      // Gently lerp the focused drone to center and smooth its yaw
+      ref.current.position.lerp(focusTarget, 1 - Math.exp(-4 * delta));
+      const euler = ref.current.rotation;
+      euler.y = THREE.MathUtils.lerp(euler.y, 0, 1 - Math.exp(-4 * delta));
+    });
+  });
+
+  return (
+    <>
+      <group ref={refs[0]}>
+        <DroneModel />
+      </group>
+      <group ref={refs[1]}>
+        <DroneModel />
+      </group>
+      <group ref={refs[2]}>
+        <DroneModel />
+      </group>
+    </>
+  );
+}
+
+function SystemOverlayLite({ title, body, visible }: { title?: string; body?: string; visible: boolean }) {
+  if (!visible) return null;
+  return (
+    <div className="absolute inset-0 pointer-events-none flex items-center justify-center z-30">
+      <div className="bg-black/60 backdrop-blur-sm text-white p-4 rounded-lg border border-cyan-400 shadow-lg max-w-md text-center">
+        <div className="text-cyan-300 font-semibold mb-2">{title}</div>
+        <div className="text-sm text-white/90 leading-relaxed">{body}</div>
+      </div>
+    </div>
+  );
+}
+
+function CameraLerper({
+  camRef,
+  focusStage,
+  active,
+  activePreset,
+  onArrive,
+}: {
+  camRef: React.RefObject<THREE.PerspectiveCamera | null>;
+  focusStage: "idle" | "focusing" | "pinned";
+  active: boolean;
+  activePreset: { camera: { position: [number, number, number]; lookAt: [number, number, number]; fov: number } } | null;
+  onArrive: () => void;
+}) {
+  const targetRef = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+  const desiredLook = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+  const desiredPos = useMemo(() => new THREE.Vector3(), []);
+
+  useFrame((_, delta) => {
+    const cam = camRef.current;
+    if (!cam) return;
+
+    if (!active || focusStage === "idle" || !activePreset) {
+      desiredPos.set(0, 0.8, 4);
+      desiredLook.set(0, 0, 0);
+    } else {
+      desiredPos.set(...activePreset.camera.position);
+      desiredLook.set(...activePreset.camera.lookAt);
+    }
+
+    cam.position.lerp(desiredPos, 1 - Math.exp(-4 * delta));
+    targetRef.lerp(desiredLook, 1 - Math.exp(-4 * delta));
+    cam.lookAt(targetRef);
+
+    if (cam instanceof THREE.PerspectiveCamera && activePreset) {
+      cam.fov += (activePreset.camera.fov - cam.fov) * (1 - Math.exp(-4 * delta));
+      cam.updateProjectionMatrix();
+    }
+
+    if (focusStage === "focusing" && cam.position.distanceTo(desiredPos) < 0.08) {
+      onArrive();
+    }
+  });
+
+  return null;
+}
+
+function LayerScene({
+  layerId,
+  focusedIndex,
+  focusStage,
+}: {
+  layerId: number;
+  focusedIndex: number | null;
+  focusStage: "idle" | "focusing" | "pinned";
+}) {
   switch (layerId) {
     case 1:
       return (
@@ -295,19 +499,7 @@ function LayerScene({ layerId }: { layerId: number }) {
         <CropDusterModel />
       );
     case 3:
-      return (
-        <>
-          <Spin speed={0.3}>
-            <DroneModel position={[-0.8, -0.01, 0]} />
-          </Spin>
-          <Spin speed={0.35}>
-            <DroneModel position={[0, -0.01, 0]} />
-          </Spin>
-          <Spin speed={0.28}>
-            <DroneModel position={[0.8, -0.01, 0]} />
-          </Spin>
-        </>
-      );
+      return <DronesScene focusedIndex={focusedIndex} focusStage={focusStage} />;
     case 4:
     default:
       return (

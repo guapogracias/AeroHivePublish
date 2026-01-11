@@ -41,87 +41,51 @@ const DEFAULT_TREE: WheelNode = {
     {
       id: "seg-2",
       label: "Segment 2",
-      imageSrc: "/images/platformoverview/assertregistry.png",
+      imageSrc: "/images/applicationwheel/parentwheel/construction.png",
       disabled: true,
-      children: [
-        { id: "seg-2-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
-        { id: "seg-2-b", label: "Child B", imageSrc: "/images/platformoverview/executionmanagement.png" },
-        { id: "seg-2-c", label: "Child C", imageSrc: "/images/platformoverview/compliancereporting.png" },
-        { id: "seg-2-d", label: "Child D", imageSrc: "/images/platformoverview/missiondesign.png" },
-        { id: "seg-2-e", label: "Child E", imageSrc: "/images/platformoverview/spatialscope.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-3",
       label: "Segment 3",
-      imageSrc: "/images/platformoverview/missiondesign.png",
+      imageSrc: "/images/applicationwheel/parentwheel/disaster.png",
       disabled: true,
-      children: [
-        { id: "seg-3-a", label: "Child A", imageSrc: "/images/platformoverview/temporalchange.png" },
-        { id: "seg-3-b", label: "Child B", imageSrc: "/images/platformoverview/conditionintelligence.png" },
-        { id: "seg-3-c", label: "Child C", imageSrc: "/images/platformoverview/actionplanning.png" },
-        { id: "seg-3-d", label: "Child D", imageSrc: "/images/platformoverview/executionmanagement.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-4",
       label: "Segment 4",
-      imageSrc: "/images/platformoverview/temporalchange.png",
+      imageSrc: "/images/applicationwheel/parentwheel/electric.png",
       disabled: true,
-      children: [
-        { id: "seg-4-a", label: "Child A", imageSrc: "/images/platformoverview/spatialscope.png" },
-        { id: "seg-4-b", label: "Child B", imageSrc: "/images/platformoverview/missiondesign.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-5",
       label: "Segment 5",
-      imageSrc: "/images/platformoverview/conditionintelligence.png",
+      imageSrc: "/images/applicationwheel/parentwheel/fence.png",
       disabled: true,
-      children: [
-        { id: "seg-5-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
-        { id: "seg-5-b", label: "Child B", imageSrc: "/images/platformoverview/executionmanagement.png" },
-        { id: "seg-5-c", label: "Child C", imageSrc: "/images/platformoverview/compliancereporting.png" },
-        { id: "seg-5-d", label: "Child D", imageSrc: "/images/platformoverview/operationalcontext.png" },
-        { id: "seg-5-e", label: "Child E", imageSrc: "/images/platformoverview/temporalchange.png" },
-        { id: "seg-5-f", label: "Child F", imageSrc: "/images/platformoverview/assertregistry.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-6",
       label: "Segment 6",
-      imageSrc: "/images/platformoverview/operationalcontext.png",
+      imageSrc: "/images/applicationwheel/parentwheel/pipeline.png",
       disabled: true,
-      children: [
-        { id: "seg-6-a", label: "Child A", imageSrc: "/images/platformoverview/missiondesign.png" },
-        { id: "seg-6-b", label: "Child B", imageSrc: "/images/platformoverview/spatialscope.png" },
-        { id: "seg-6-c", label: "Child C", imageSrc: "/images/platformoverview/conditionintelligence.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-7",
       label: "Segment 7",
-      imageSrc: "/images/platformoverview/actionplanning.png",
+      imageSrc: "/images/applicationwheel/parentwheel/roof.png",
       disabled: true,
-      children: [
-        { id: "seg-7-a", label: "Child A", imageSrc: "/images/platformoverview/executionmanagement.png" },
-        { id: "seg-7-b", label: "Child B", imageSrc: "/images/platformoverview/compliancereporting.png" },
-        { id: "seg-7-c", label: "Child C", imageSrc: "/images/platformoverview/operationalcontext.png" },
-        { id: "seg-7-d", label: "Child D", imageSrc: "/images/platformoverview/temporalchange.png" },
-        { id: "seg-7-e", label: "Child E", imageSrc: "/images/platformoverview/assertregistry.png" },
-      ],
+      children: [],
     },
     {
       id: "seg-8",
       label: "Segment 8",
-      imageSrc: "/images/platformoverview/executionmanagement.png",
+      imageSrc: "/images/applicationwheel/parentwheel/tracking.png",
       disabled: true,
-      children: [
-        { id: "seg-8-a", label: "Child A", imageSrc: "/images/platformoverview/actionplanning.png" },
-        { id: "seg-8-b", label: "Child B", imageSrc: "/images/platformoverview/missiondesign.png" },
-        { id: "seg-8-c", label: "Child C", imageSrc: "/images/platformoverview/conditionintelligence.png" },
-        { id: "seg-8-d", label: "Child D", imageSrc: "/images/platformoverview/operationalcontext.png" },
-      ],
+      children: [],
     },
   ],
 };
@@ -306,11 +270,9 @@ export default function ApplicationWheel({
                   <path
                     d={d}
                     fill={
-                      isDisabled
-                        ? "rgba(0,0,0,0.08)"
-                        : seg.imageSrc
-                          ? `url(#pat-${seg.id})`
-                          : "var(--wheel-fill)"
+                      seg.imageSrc || seg.media
+                        ? `url(#pat-${seg.id})`
+                        : "var(--wheel-fill)"
                     }
                     stroke="var(--wheel-stroke)"
                     strokeWidth={isHovered && !seg.disabled ? 3 : 2}
@@ -332,7 +294,7 @@ export default function ApplicationWheel({
                       dominantBaseline="middle"
                       fontSize="18"
                       fontWeight={700}
-                      fill="#000"
+                      fill="#fff"
                       transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
                     >
                       Coming Soon
