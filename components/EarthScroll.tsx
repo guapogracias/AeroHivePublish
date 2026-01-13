@@ -43,7 +43,7 @@ const systemSections: Section[] = [
   {
     id: "component-01",
     type: "component",
-    caption: "Component 01",
+    caption: "Component 01.01",
     title: "PX4",
     content: "",
     layerName: "PX4",
@@ -65,7 +65,7 @@ const systemSections: Section[] = [
   {
     id: "component-02",
     type: "component",
-    caption: "Component 02",
+    caption: "Component 02.01",
     title: "Jetson",
     content: "",
     layerName: "Jetson",
@@ -87,11 +87,70 @@ const systemSections: Section[] = [
   {
     id: "component-03",
     type: "component",
-    caption: "Component 03",
+    caption: "Component 03.01",
     title: "Camera System",
     content: "",
     layerName: "camera",
     media: { type: "video", src: "/videos/CV.mp4" },
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  // CV components (placeholders; adjust content/camera as needed)
+  {
+    id: "component-cv-01",
+    type: "component",
+    caption: "Component 03.02",
+    title: "CV Part 1",
+    content:
+      "Users can upload their own images to define what they want the system to recognize. A set of example photos across angles, distances, and lighting helps the model learn the patterns that matter instead of relying on fixed, predefined categories.",
+    layerName: "camera",
+    media: undefined,
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  {
+    id: "component-cv-02",
+    type: "component",
+    caption: "Component 03.03",
+    title: "CV Part 2",
+    content: "Example video feed demonstrating the recognition pipeline.",
+    layerName: "camera",
+    media: { type: "video", src: "/videos/CV.mp4" },
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  {
+    id: "component-cv-03",
+    type: "component",
+    caption: "",
+    title: "",
+    content: "",
+    layerName: "camera",
+    media: { type: "diagram" },
+    cameraConfig: {
+      position: [1.5, 0.5, 2],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.5,
+    },
+  },
+  {
+    id: "component-cv-04",
+    type: "component",
+    caption: "Component 03.05",
+    title: "CV Part 4",
+    content:
+      "Once trained on those examples, the drone uses its onboard sensors and cameras to identify the same patterns during flight. As it scans an area, the system matches what it sees against the uploaded references in real time, allowing it to detect, locate, and map user-defined items such as that specific car directly within the environment. Because detections are tied to spatial data, identified items are placed precisely on the map and can be tracked across passes, making it possible to see where they appear, when they were last observed, and how their surroundings or condition change over time.",
+    layerName: "camera",
+    media: undefined,
     cameraConfig: {
       position: [1.5, 0.5, 2],
       lookAtOffset: [0, 0, 0],
@@ -109,9 +168,53 @@ const systemSections: Section[] = [
   {
     id: "component-04",
     type: "component",
-    caption: "Component 04",
+    caption: "Component 04.01",
     title: "LiDAR",
+    content:
+      "Because a point cloud captures structure rather than appearance, the environment becomes something that can be measured instead of merely viewed. Distances, volumes, canopy height, slope, spacing, and terrain variation can be calculated directly, removing the need for visual estimation or manual interpretation.",
+    layerName: "LiDAR",
+    media: undefined,
+    cameraConfig: {
+      position: [2, 1, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+  {
+    id: "component-04-02",
+    type: "component",
+    caption: "Component 04.02",
+    title: "Single Photo vs Point Cloud",
     content: "",
+    media: { type: "slider" },
+    layerName: "LiDAR",
+    cameraConfig: {
+      position: [2, 3, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+  {
+    id: "component-04-03",
+    type: "component",
+    caption: "Component 04.03",
+    title: "LiDAR Part 3",
+    content:
+      "That same structural record makes change detectable over time. By aligning scans collected on different dates, growth, loss, movement, or deformation can be identified with precision that photos or human observation cannot reliably achieve, producing a consistent and objective representation that software can analyze the same way across locations and seasons.",
+    layerName: "LiDAR",
+    media: undefined,
+    cameraConfig: {
+      position: [2, 1, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+  {
+    id: "component-04-04",
+    type: "component",
+    caption: "Component 04.04",
+    title: "LiDAR Part 4",
+    content: "LiDAR module: Part 4",
     layerName: "LiDAR",
     media: { type: "video", src: "/videos/LiDAR.webm" },
     cameraConfig: {
@@ -156,7 +259,7 @@ const layers: Layer[] = [
   {
     id: 4,
     title: "Ground Level",
-    subtitle: "Tractors",
+    subtitle: "Ground Vechicles",
     altitude: "0 meters",
     icon: Tractor,
     image: "/images/earth/ground.jpg",
@@ -181,6 +284,14 @@ export function EarthScroll() {
   const camRef = useRef<THREE.PerspectiveCamera | null>(null);
   const [currentSystemIndex, setCurrentSystemIndex] = useState(0);
   const currentSystemSection = systemSections[currentSystemIndex];
+  const isWideOverlay =
+    !!currentSystemSection &&
+    isComponentSection(currentSystemSection) &&
+    (currentSystemSection.media?.type === "diagram" || currentSystemSection.media?.type === "slider");
+  const isSliderOverlay =
+    !!currentSystemSection &&
+    isComponentSection(currentSystemSection) &&
+    currentSystemSection.media?.type === "slider";
   const [suppressFocus, setSuppressFocus] = useState(false);
   const lastWheelRef = useRef(0);
   const activeCameraPreset =
@@ -342,7 +453,15 @@ export function EarthScroll() {
               />
             </div>
             {currentSystemSection && (
-              <div className="absolute bottom-[8%] left-[4%] md:left-[5%] z-30 w-[90%] md:w-[35%] max-w-[450px] pointer-events-auto">
+              <div
+                className={`absolute bottom-[8%] left-[4%] md:left-[5%] z-30 pointer-events-auto ${
+                  isWideOverlay
+                    ? isSliderOverlay
+                      ? "w-[90%] md:w-[39%] max-w-[690px]"
+                      : "w-[92%] md:w-[52%] max-w-[920px]"
+                    : "w-[90%] md:w-[35%] max-w-[450px]"
+                }`}
+              >
                 <div className="bg-[var(--bg-black)]/80 backdrop-blur-md rounded-lg p-6 md:p-8 border border-[var(--divider)]">
                   {(() => {
                     const isLast = currentSystemIndex === systemSections.length - 1;

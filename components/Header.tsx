@@ -65,9 +65,6 @@ export default function Header() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <Link href="/demo" className="btn-primary font-semibold">
-              Get a Demo
-            </Link>
             <button 
               className="text-[var(--text-primary)]"
               aria-label={isMenuOpen ? "Close menu" : "Open menu"}
@@ -107,9 +104,6 @@ export default function Header() {
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-            <Link href="/demo" className="btn-primary font-semibold">
-              Get a Demo
-            </Link>
           </div>
         </div>
 

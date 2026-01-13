@@ -14,6 +14,8 @@ export default function ImageCompareSlider({
   leftImageStyle,
   rightImageStyle,
   initial = 0.6,
+  height = "min(62vh, 680px)",
+  minHeight = 420,
 }: {
   leftLabel?: string;
   rightLabel?: string;
@@ -25,6 +27,10 @@ export default function ImageCompareSlider({
   rightImageStyle?: React.CSSProperties;
   /** 0..1, position of divider from left */
   initial?: number;
+  /** CSS height string for the slider container */
+  height?: string;
+  /** Min height in px for the slider container */
+  minHeight?: number;
 }) {
   const wrapRef = useRef<HTMLDivElement | null>(null);
   // Keep the divider away from the edges so it never visually collides with adjacent columns.
@@ -68,8 +74,8 @@ export default function ImageCompareSlider({
       ref={wrapRef}
       className="relative w-full rounded-2xl border border-[var(--divider)] overflow-hidden bg-[var(--surface-1)]"
       style={{
-        height: "min(62vh, 680px)",
-        minHeight: 420,
+        height,
+        minHeight,
       }}
     >
       {/* Right/base image (point cloud) */}

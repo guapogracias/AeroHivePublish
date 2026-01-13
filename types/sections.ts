@@ -16,6 +16,17 @@ export type SectionMedia =
       type: "image";
       src: string;
       alt?: string;
+    }
+  | {
+      type: "slider";
+      leftImageSrc?: string;
+      rightImageSrc?: string;
+      leftImageStyle?: React.CSSProperties;
+      rightImageStyle?: React.CSSProperties;
+      initial?: number;
+    }
+  | {
+      type: "diagram";
     };
 
 export interface BaseSection {

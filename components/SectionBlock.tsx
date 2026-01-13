@@ -2,6 +2,8 @@
 
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import DecryptedText from "./DecryptedText";
+import ImageCompareSlider from "./ImageCompareSlider";
+import NeuralNetworkViz from "./NeuralNetworkViz";
 import type { SectionMedia } from "@/types/sections";
 
 interface SectionBlockProps {
@@ -25,24 +27,34 @@ export default function SectionBlock({
   canGoBack = false,
   canGoNext = false,
 }: SectionBlockProps) {
+  const isDiagram = media?.type === "diagram";
+
   return (
     <div>
-      <h3 className="text-h3 text-[var(--text-primary)] mb-3">
-        <DecryptedText
-          text={caption}
-          animateOn="view"
-          revealDirection="start"
-          speed={40}
-          maxIterations={15}
-          sequential={true}
-        />
-      </h3>
-      <p className="text-h2 text-[var(--text-primary)] mb-4">
-        {title}
-      </p>
-      <p className="text-body-md text-[var(--text-secondary)] mb-6">
-        {content}
-      </p>
+      {caption ? (
+        <h3 className="text-h3 text-[var(--text-primary)] mb-3">
+          <DecryptedText
+            text={caption}
+            animateOn="view"
+            revealDirection="start"
+            speed={40}
+            maxIterations={15}
+            sequential={true}
+          />
+        </h3>
+      ) : null}
+
+      {title ? (
+        <p className="text-h2 text-[var(--text-primary)] mb-4">
+          {title}
+        </p>
+      ) : null}
+
+      {content ? (
+        <p className="text-body-md text-[var(--text-secondary)] mb-6">
+          {content}
+        </p>
+      ) : null}
 
       {media?.type === "video" ? (
         <div className="mb-6">
@@ -68,9 +80,47 @@ export default function SectionBlock({
         </div>
       ) : null}
 
+      {media?.type === "slider" ? (
+        <div className="mb-6">
+          <ImageCompareSlider
+            leftLabel="Single Photo"
+            rightLabel="Point Cloud"
+            leftImageSrc={media.leftImageSrc ?? "/images/islandphoto.png"}
+            rightImageSrc={media.rightImageSrc ?? "/images/island_gif~1.gif"}
+            initial={media.initial ?? 0.6}
+            height="min(46vh, 520px)"
+            minHeight={320}
+            leftImageStyle={
+              media.leftImageStyle ?? {
+                transform: "scale(1.18) translateY(-2%)",
+                transformOrigin: "center",
+              }
+            }
+            rightImageStyle={
+              media.rightImageStyle ?? {
+                transform: "scale(1.18) translateY(-2%)",
+                transformOrigin: "center",
+              }
+            }
+          />
+        </div>
+      ) : null}
+
+      {media?.type === "diagram" ? (
+        <div className="mb-6 rounded-lg border border-[var(--divider)] bg-[var(--surface-1)] p-1 overflow-hidden max-h-[380px] md:max-h-[420px]">
+          <div style={{ zoom: 0.75 }}>
+            <NeuralNetworkViz variant="compact" />
+          </div>
+        </div>
+      ) : null}
+
       {/* Navigation controls */}
       {(onBack || onNext) && (
-        <div className="flex items-center gap-6 text-[var(--text-primary)] pt-4 border-t border-[var(--divider)]">
+        <div
+          className={`flex items-center gap-6 text-[var(--text-primary)] border-t border-[var(--divider)] ${
+            isDiagram ? "pt-2" : "pt-4"
+          }`}
+        >
           {onBack && (
             <button
               onClick={onBack}
