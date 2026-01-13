@@ -9,8 +9,8 @@ import { useEffect, useMemo, useState } from "react";
 const navItems = [
   { label: "Overview", href: "/" },
   { label: "System", href: "/system" },
-  { label: "Application", href: "/coverage" },
-  { label: "Contact", href: "/contact" },
+  { label: "Application", href: "/#application" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 export default function Header() {
@@ -77,7 +77,7 @@ export default function Header() {
           {/* Desktop: Navigation - Columns 2-3 */}
           <nav className="hidden md:col-span-2 md:flex items-center justify-center gap-0.5">
             {navItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = item.href.startsWith("/#") ? pathname === "/" : pathname === item.href;
               return (
                 <Link
                   key={item.href}
@@ -112,7 +112,7 @@ export default function Header() {
           <div className="md:hidden absolute top-full left-0 right-0 bg-[var(--bg-primary)] border-b border-[var(--divider)]">
             <nav className="flex flex-col py-4">
               {navItems.map((item) => {
-                const isActive = pathname === item.href;
+                const isActive = item.href.startsWith("/#") ? pathname === "/" : pathname === item.href;
                 return (
                   <Link
                     key={item.href}

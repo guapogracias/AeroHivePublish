@@ -271,8 +271,32 @@ const layers: Layer[] = [
 const GROUND_LAYOUT = {
   y: -0.02, // sinks the wheels slightly into the soil plane
   // Angles are in radians; tweak yaw for heading, pitch for tilt toward/away camera, roll to lean.
-  tractor: { screenX: 0.42, screenY: 0.37, yaw: 3.23, pitch: -0.06, roll: -0.02 },
-  excavator: { screenX: 0.32, screenY: 0.6, yaw: 1.29, pitch: -0.04, roll: -0.01 },
+  tractor: { screenX: 0.27, screenY: 0.37, yaw: 3.23, pitch: -0.06, roll: -0.02 },
+  excavator: { screenX: 0.2, screenY: 0.6, yaw: 1.29, pitch: -0.04, roll: -0.01 },
+};
+
+// Mirror the entire Ground layer horizontally (background + model placement + excavator motion).
+const MIRROR_GROUND = true;
+
+// Top-left text overlays per layer index (0=satellite, 1=crop duster, 2=drones, 3=ground).
+// Edit these strings to change the visible labels + body copy.
+const LAYER_TOP_LEFT_CONTENT: Partial<
+  Record<
+    number,
+    {
+      title: string;
+      body?: string;
+    }
+  >
+> = {
+  0: {
+    title: "Satellite",
+    body: `Satellites provide broad visibility but limited resolution and infrequent updates.
+They can suggest where issues might exist, but they cannot measure structures, track individual assets, or reconcile change precisely over time.
+Without AeroHive, satellite data remains descriptive — not actionable.`,
+  },
+  1: { title: "Crop Duster" },
+  3: { title: "Tractor" },
 };
 
 export function EarthScroll() {
@@ -419,6 +443,12 @@ export function EarthScroll() {
           const isActive = index === currentLayer;
           const isPast = index < currentLayer;
           const isFuture = index > currentLayer;
+          const isGroundLayer = l.id === 4;
+          const baseTransform = isPast
+            ? "scale(1.15) translateY(-30%)"
+            : isFuture
+              ? "scale(0.9) translateY(30%)"
+              : "scale(1) translateY(0)";
 
           return (
             <div
@@ -429,16 +459,27 @@ export function EarthScroll() {
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 opacity: isActive ? 1 : 0,
-                transform: isPast
-                  ? "scale(1.15) translateY(-30%)"
-                  : isFuture
-                    ? "scale(0.9) translateY(30%)"
-                    : "scale(1) translateY(0)",
+                transform:
+                  isGroundLayer && MIRROR_GROUND ? `${baseTransform} scaleX(-1)` : baseTransform,
                 filter: "none",
               }}
             />
           );
         })}
+
+        {/* Top-left overlays (kept off when the System overlay card is showing) */}
+        {focusStage === "idle" && LAYER_TOP_LEFT_CONTENT[currentLayer] && (
+          <div className="absolute top-[160px] left-[4%] md:left-[5%] z-30 pointer-events-none">
+            <h2 className="text-h1 text-[var(--text-primary)]">
+              {LAYER_TOP_LEFT_CONTENT[currentLayer]!.title}
+            </h2>
+            {LAYER_TOP_LEFT_CONTENT[currentLayer]!.body ? (
+              <p className="mt-3 max-w-[520px] text-body-md text-[var(--text-secondary)] whitespace-pre-line">
+                {LAYER_TOP_LEFT_CONTENT[currentLayer]!.body}
+              </p>
+            ) : null}
+          </div>
+        )}
 
         {/* Center 3D models per layer */}
         {currentLayer === 2 && focusStage !== "idle" ? (
@@ -504,33 +545,33 @@ export function EarthScroll() {
             )}
           </>
         ) : (
-          <div className="absolute inset-0 pointer-events-none" key={currentLayer}>
-            <Canvas
-              camera={{ position: [0, 0.8, 4], fov: 45 }}
-              gl={{ antialias: true, alpha: true }}
-              onCreated={({ gl, camera }) => {
-                gl.setClearColor(0x000000, 0);
-                camRef.current = camera as THREE.PerspectiveCamera;
-              }}
-              className="w-full h-full"
-            >
-              <CameraLerper
-                camRef={camRef}
-                focusStage={focusStage}
-                active={currentLayer === 2}
+        <div className="absolute inset-0 pointer-events-none" key={currentLayer}>
+          <Canvas
+            camera={{ position: [0, 0.8, 4], fov: 45 }}
+            gl={{ antialias: true, alpha: true }}
+            onCreated={({ gl, camera }) => {
+              gl.setClearColor(0x000000, 0);
+              camRef.current = camera as THREE.PerspectiveCamera;
+            }}
+            className="w-full h-full"
+          >
+            <CameraLerper
+              camRef={camRef}
+              focusStage={focusStage}
+              active={currentLayer === 2}
                 activePreset={activeCameraPreset}
-                onArrive={() => {
-                  if (focusStage === "focusing") setFocusStage("pinned");
-                }}
-              />
-              <ambientLight intensity={1.1} />
-              <directionalLight position={[3, 5, 3]} intensity={1.2} />
-              <Suspense fallback={null}>
-                <LayerScene layerId={layer.id} focusedIndex={focusedIndex} focusStage={focusStage} />
-              </Suspense>
-              <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
-            </Canvas>
-          </div>
+              onArrive={() => {
+                if (focusStage === "focusing") setFocusStage("pinned");
+              }}
+            />
+            <ambientLight intensity={1.1} />
+            <directionalLight position={[3, 5, 3]} intensity={1.2} />
+            <Suspense fallback={null}>
+              <LayerScene layerId={layer.id} focusedIndex={focusedIndex} focusStage={focusStage} />
+            </Suspense>
+            <OrbitControls enableZoom={false} enablePan={false} enableRotate={false} />
+          </Canvas>
+        </div>
         )}
 
         {/* Layer Indicator - Right Side */}
@@ -621,9 +662,9 @@ function SatelliteModel() {
 const SAT_ORBIT = {
   radius: 0.8,
   height: 0.35,
-  speed: 0, // pinned position
+  speed: -0.001, // pinned position
   baseAngle: -1.25, // controls where it sits around Earth
-  spinSpeed: 0.80, // blade-like roll around the look axis
+  spinSpeed: 0.16, // blade-like roll around the look axis (20% speed)
 };
 
 function SatelliteOrbit() {
@@ -718,7 +759,7 @@ function TractorModel() {
 function ExcavatorModel() {
   const { scene } = useGLTF("/models/excavator_cat-optimized.glb");
   // Larger by +0.3 (0.7 -> 1.0) to better match the tractor size.
-  return <primitive object={scene} scale={19.0} rotation={[0, 0, 0]} position={[-0.3, 0, 0]} />;
+  return <primitive object={scene} scale={27.0} rotation={[0, 0, 0]} position={[-0.3, 0, 0]} />;
 }
 
 function groundAnchorFromScreen(camera: THREE.PerspectiveCamera, screenX: number, screenY: number, groundY: number) {
@@ -743,25 +784,27 @@ function GroundVehicles() {
 
     const excavatorPos = groundAnchorFromScreen(
       camera,
-      GROUND_LAYOUT.excavator.screenX,
+      MIRROR_GROUND ? 1 - GROUND_LAYOUT.excavator.screenX : GROUND_LAYOUT.excavator.screenX,
       GROUND_LAYOUT.excavator.screenY,
       GROUND_LAYOUT.y,
     );
     const tractorPos = groundAnchorFromScreen(
       camera,
-      GROUND_LAYOUT.tractor.screenX,
+      MIRROR_GROUND ? 1 - GROUND_LAYOUT.tractor.screenX : GROUND_LAYOUT.tractor.screenX,
       GROUND_LAYOUT.tractor.screenY,
       GROUND_LAYOUT.y,
     );
 
     if (excavatorRef.current) {
       const baseYaw = GROUND_LAYOUT.excavator.yaw ?? 0;
-      const animYaw = baseYaw + Math.sin(timeRef.current * 1.1) * 0.06; // gentle left-right swivel
+      const animYaw = MIRROR_GROUND
+        ? -baseYaw - Math.sin(timeRef.current * 1.1) * 0.06
+        : baseYaw + Math.sin(timeRef.current * 1.1) * 0.06; // gentle left-right swivel
       excavatorRef.current.position.copy(excavatorPos);
       excavatorRef.current.rotation.set(
         GROUND_LAYOUT.excavator.pitch ?? 0,
         animYaw,
-        GROUND_LAYOUT.excavator.roll ?? 0,
+        MIRROR_GROUND ? -(GROUND_LAYOUT.excavator.roll ?? 0) : (GROUND_LAYOUT.excavator.roll ?? 0),
       );
     }
 
@@ -769,8 +812,8 @@ function GroundVehicles() {
       tractorRef.current.position.copy(tractorPos);
       tractorRef.current.rotation.set(
         GROUND_LAYOUT.tractor.pitch ?? 0,
-        GROUND_LAYOUT.tractor.yaw ?? 0,
-        GROUND_LAYOUT.tractor.roll ?? 0,
+        MIRROR_GROUND ? -(GROUND_LAYOUT.tractor.yaw ?? 0) : (GROUND_LAYOUT.tractor.yaw ?? 0),
+        MIRROR_GROUND ? -(GROUND_LAYOUT.tractor.roll ?? 0) : (GROUND_LAYOUT.tractor.roll ?? 0),
       );
     }
   });

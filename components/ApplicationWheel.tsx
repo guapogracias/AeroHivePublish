@@ -23,6 +23,8 @@ type WheelNode = {
   disabled?: boolean;
 };
 
+const WHEEL_FONT = "var(--font-sans)";
+
 // Placeholder structure — replace labels/counts with your real application taxonomy.
 const DEFAULT_TREE: WheelNode = {
   id: "root",
@@ -33,9 +35,14 @@ const DEFAULT_TREE: WheelNode = {
       label: "Agriculture",
       imageSrc: "/images/applicationwheel/parentwheel/agriculture.png",
       children: [
-        { id: "seg-1-a", label: "Child A", imageSrc: "/images/platformoverview/temporalchange.png" },
-        { id: "seg-1-b", label: "Child B", imageSrc: "/images/platformoverview/conditionintelligence.png" },
-        { id: "seg-1-c", label: "Child C", imageSrc: "/images/platformoverview/operationalcontext.png" },
+        { id: "seg-1-a", label: "Blueberries", imageSrc: "/images/applicationwheel/childagriculture/blueberries.png" },
+        { id: "seg-1-b", label: "Cherries", imageSrc: "/images/applicationwheel/childagriculture/cherries.png" },
+        { id: "seg-1-c", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/corn.png" },
+        { id: "seg-1-d", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/grapes.png" },
+        { id: "seg-1-e", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/oranges.png" },
+        { id: "seg-1-f", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/tomatoes.png" },
+        { id: "seg-1-g", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/almonds.png" },
+        { id: "seg-1-h", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/apples.png" },
       ],
     },
     {
@@ -199,6 +206,7 @@ export default function ApplicationWheel({
             width="100%"
             viewBox={`0 0 ${geometry.size} ${geometry.size}`}
             className="max-w-[900px]"
+            style={{ fontFamily: WHEEL_FONT }}
             role="img"
             aria-label="Application navigation wheel"
           >
@@ -286,35 +294,19 @@ export default function ApplicationWheel({
                     }}
                     opacity={isDisabled ? 0.9 : 1}
                   />
-                  {isDisabled ? (
-                    <text
-                      x={labelX}
-                      y={labelY}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize="18"
-                      fontWeight={700}
-                      fill="#fff"
-                      transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
-                    >
-                      Coming Soon
-                    </text>
-                  ) : (
-                    <text
-                      x={labelX}
-                      y={labelY}
-                      textAnchor="middle"
-                      dominantBaseline="middle"
-                      fontSize="18"
-                      fontWeight={800}
-                      fill="#fff"
-                      stroke="rgba(0,0,0,0.45)"
-                      strokeWidth="0.8"
-                      transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
-                    >
-                      {seg.label}
-                    </text>
-                  )}
+                  <text
+                    x={labelX}
+                    y={labelY}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                    fontSize="18"
+                    fontFamily={WHEEL_FONT}
+                    fontWeight={700}
+                    fill="#fff"
+                    transform={`rotate(${(mid * 180) / Math.PI + 90} ${labelX} ${labelY})`}
+                  >
+                    {seg.disabled ? "Coming Soon" : seg.label}
+                  </text>
                 </g>
               );
             })}
@@ -327,6 +319,7 @@ export default function ApplicationWheel({
                   y={geometry.cy - 4}
                   textAnchor="middle"
                   fontSize="16"
+                  fontFamily={WHEEL_FONT}
                   fill="var(--wheel-text)"
                 >
                   Select a segment
@@ -336,6 +329,7 @@ export default function ApplicationWheel({
                   y={geometry.cy + 18}
                   textAnchor="middle"
                   fontSize="16"
+                  fontFamily={WHEEL_FONT}
                   fill="var(--wheel-text)"
                 >
                   to explore.

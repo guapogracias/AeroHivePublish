@@ -1,6 +1,8 @@
 import Hero from '@/components/Hero';
 import ScrollShowcase from '@/components/ScrollShowcase';
 import { EarthScroll } from '@/components/EarthScroll';
+import ApplicationSection from "@/components/ApplicationSection";
+import ContactSection from "@/components/ContactSection";
 
 export default function OverviewPage() {
   return (
@@ -8,6 +10,8 @@ export default function OverviewPage() {
       <Hero />
       <EarthScroll />
       <ScrollShowcase />
+      <ApplicationSection showBackground={false} />
+      <ContactSection />
     </main>
   );
 }
