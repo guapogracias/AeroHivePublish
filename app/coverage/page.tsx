@@ -1,9 +1,5 @@
-import ApplicationSection from "@/components/ApplicationSection";
+import { redirect } from "next/navigation";
 
 export default function ApplicationPage() {
-  return (
-    <main className="flex flex-col min-h-screen bg-[var(--bg-black)]">
-      <ApplicationSection showBackground />
-    </main>
-  );
+  redirect("/?section=application");
 }

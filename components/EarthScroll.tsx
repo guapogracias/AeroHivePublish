@@ -290,13 +290,20 @@ const LAYER_TOP_LEFT_CONTENT: Partial<
   >
 > = {
   0: {
-    title: "Satellite",
-    body: `Satellites provide broad visibility but limited resolution and infrequent updates.
-They can suggest where issues might exist, but they cannot measure structures, track individual assets, or reconcile change precisely over time.
-Without AeroHive, satellite data remains descriptive — not actionable.`,
+    title: "Without AeroHive, satellite data remains descriptive",
+    body:
+      "Satellites provide broad visibility but limited resolution and infrequent updates. They can suggest where issues might exist, but they cannot measure structures, track individual assets, or reconcile change precisely over time.",
   },
-  1: { title: "Crop Duster" },
-  3: { title: "Tractor" },
+  1: {
+    title: "Without AeroHive, aerial intervention is blind",
+    body:
+      "Crop dusters are efficient at applying treatments, but they rely on pre-defined maps or manual scouting to decide where to act. This leads to blanket application, delayed response, or missed risk.",
+  },
+  3: {
+    title: "Without AeroHive, equipment operates on imprecise data",
+    body:
+      "Ground equipment executes work at scale, but it depends entirely on the quality of the instructions it receives. When those instructions are based on averages or outdated assumptions, execution becomes inefficient and wasteful.",
+  },
 };
 
 export function EarthScroll() {
@@ -468,16 +475,40 @@ export function EarthScroll() {
         })}
 
         {/* Top-left overlays (kept off when the System overlay card is showing) */}
-        {focusStage === "idle" && LAYER_TOP_LEFT_CONTENT[currentLayer] && (
+        {focusStage === "idle" && LAYER_TOP_LEFT_CONTENT[currentLayer]?.body ? (
           <div className="absolute top-[160px] left-[4%] md:left-[5%] z-30 pointer-events-none">
-            <h2 className="text-h1 text-[var(--text-primary)]">
-              {LAYER_TOP_LEFT_CONTENT[currentLayer]!.title}
-            </h2>
-            {LAYER_TOP_LEFT_CONTENT[currentLayer]!.body ? (
-              <p className="mt-3 max-w-[520px] text-body-md text-[var(--text-secondary)] whitespace-pre-line">
-                {LAYER_TOP_LEFT_CONTENT[currentLayer]!.body}
-              </p>
-            ) : null}
+            <div className="relative max-w-[680px]">
+              {/* Scrim to keep text legible on bright backgrounds (consistent across layers) */}
+              <div
+                className="absolute -inset-x-6 -inset-y-5 rounded-2xl z-0"
+                style={{
+                  background:
+                    "linear-gradient(180deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.40) 100%)",
+                  filter: "blur(0px)",
+                }}
+              />
+              <div className="relative z-10">
+                <div
+                  className="text-h2 text-white"
+                  style={{ textShadow: "0 2px 18px rgba(0,0,0,0.55)" }}
+                >
+                  {LAYER_TOP_LEFT_CONTENT[currentLayer]!.title}
+                </div>
+                <p
+                  className="mt-2 text-body-md text-white whitespace-normal leading-relaxed"
+                  style={{ textShadow: "0 2px 22px rgba(0,0,0,0.75)" }}
+                >
+                  {LAYER_TOP_LEFT_CONTENT[currentLayer]!.body}
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Drone layer title (matches System page). Shown only during swarm view, hidden when overlay cards show. */}
+        {currentLayer === 2 && focusStage === "idle" && (
+          <div className="absolute top-[80px] left-[4%] md:left-[5%] z-30 pointer-events-none">
+            <h2 className="text-h1 text-[var(--text-primary)]">Our Drone Model</h2>
           </div>
         )}
 

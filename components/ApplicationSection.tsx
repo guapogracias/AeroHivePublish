@@ -12,7 +12,7 @@ export default function ApplicationSection({
   return (
     <section
       id={id}
-      className="relative w-full bg-[var(--bg-black)] border-y border-[var(--divider)]"
+      className="relative w-full grid-bg border-y border-[var(--divider)]"
       style={{ minHeight: "calc(100vh - 64px)" }}
     >
       {showBackground ? (

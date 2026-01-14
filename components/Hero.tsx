@@ -2,7 +2,7 @@ import DroneSwarmASCII from "./DroneSwarmASCII";
 
 export default function Hero() {
   return (
-    <section className="relative w-full min-h-[100vh] bg-[var(--bg-black)] overflow-hidden border-b border-[var(--divider)]">
+    <section className="relative w-full min-h-[100vh] grid-bg overflow-hidden border-b border-[var(--divider)]">
       {/* Container with max-width and padding */}
       <div className="container-main relative h-full min-h-[100vh]">
         {/* Mobile: 2-column grid, Desktop: 4-column grid */}

@@ -1,10 +1,6 @@
-import ContactSection from "@/components/ContactSection";
+import { redirect } from "next/navigation";
 
 export default function ContactPage() {
-  return (
-    <main className="flex flex-col min-h-screen bg-[var(--bg-black)]">
-      <ContactSection />
-    </main>
-  );
+  redirect("/?section=contact");
 }
 

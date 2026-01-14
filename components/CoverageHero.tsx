@@ -1,6 +1,6 @@
 export default function CoverageHero() {
   return (
-    <section className="relative w-full bg-[var(--bg-black)] border-b border-[var(--divider)]">
+    <section className="relative w-full bg-[var(--bg-primary)] border-b border-[var(--divider)]">
       <div className="container-main relative">
         <div className="grid grid-cols-2 md:grid-cols-4 min-h-[60vh] md:min-h-[600px]">
           {/* Vertical Dotted Lines */}

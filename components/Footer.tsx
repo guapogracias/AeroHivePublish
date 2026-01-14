@@ -2,7 +2,7 @@ import ProfoundIsotypeASCII from './ProfoundIsotypeASCII';
 
 export default function Footer() {
   return (
-    <footer className="relative w-full bg-[var(--bg-black)] border-t border-[var(--divider)]">
+    <footer className="relative w-full bg-[var(--bg-primary)] border-t border-[var(--divider)]">
       <div className="container-main relative py-12">
         <div className="flex flex-row items-center justify-between px-4">
           {/* Text Content - Left aligned */}

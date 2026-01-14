@@ -239,7 +239,7 @@ export default function ScrollShowcase({
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-[var(--bg-black)] border-y border-[var(--divider)]"
+      className="relative w-full grid-bg border-y border-[var(--divider)]"
       // Tall section to create scroll distance that advances across 9 cards.
       // Keep scrollytelling, but avoid a huge "dead" scroll gap before the next section.
       // Smaller multiplier = you progress through cards faster and reach Roadmap sooner.

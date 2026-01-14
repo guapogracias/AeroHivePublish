@@ -19,7 +19,7 @@ function Value({
 }: ValueProps) {
   return (
     <div 
-      className={`relative col-span-2 md:col-span-1 bg-[var(--bg-black)] ${borderClasses}`}
+      className={`relative col-span-2 md:col-span-1 bg-[var(--bg-primary)] ${borderClasses}`}
       style={{ height: typeof height === 'number' ? `${height}px` : height }}
     >
       <div className="h-full px-8 py-8 flex flex-col">
