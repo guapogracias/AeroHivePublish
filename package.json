@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "node -e \"const fs=require('fs'); const path='node_modules/@types/spdx-correct'; if(!fs.existsSync(path)) process.exit(0); const entries=fs.readdirSync(path); const hasDts=entries.some(f=>f.endsWith('.d.ts')) || entries.some(f=>f==='index.d.ts'); if(!hasDts){ fs.rmSync(path,{recursive:true,force:true}); console.log('Removed broken '+path); }\"",
     "start": "next start",
     "lint": "eslint",
     "optimize:model:blend2.2": "gltf-transform webp public/models/Blend2.2.glb public/models/Blend2.2-webp.glb --quality 85 && gltf-transform draco public/models/Blend2.2-webp.glb public/models/Blend2.2-optimized.glb --method edgebreaker"
