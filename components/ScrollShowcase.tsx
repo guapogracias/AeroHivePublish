@@ -277,7 +277,7 @@ export default function ScrollShowcase({
                       className={[
                         "px-6 py-3 rounded-full text-body-sm font-medium transition-colors",
                         isActive
-                          ? "bg-[var(--text-primary)] text-[var(--bg-primary)]"
+                          ? "bg-emerald-500 text-white"
                           : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]",
                       ].join(" ")}
                     >

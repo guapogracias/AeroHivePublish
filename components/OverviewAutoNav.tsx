@@ -12,15 +12,19 @@ function scrollToY(y: number) {
 export default function OverviewAutoNav() {
   const params = useSearchParams();
   const router = useRouter();
-  const ranRef = useRef(false);
+  const lastSectionRef = useRef<string>("");
+  const lastRunAtRef = useRef<number>(0);
 
   useEffect(() => {
     const section = (params.get("section") ?? "").toLowerCase();
     if (!section) return;
 
-    // Prevent double-run from React strict mode / re-renders.
-    if (ranRef.current) return;
-    ranRef.current = true;
+    // Prevent double-run from React strict mode / re-renders, but still allow
+    // new navigations to different sections.
+    const now = Date.now();
+    if (lastSectionRef.current === section && now - lastRunAtRef.current < 800) return;
+    lastSectionRef.current = section;
+    lastRunAtRef.current = now;
 
     // Always clear the query param after we navigate so refresh doesn't re-jump.
     const clearParamSoon = () => {

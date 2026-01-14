@@ -35,7 +35,7 @@ const DEFAULT_TREE: WheelNode = {
       label: "Agriculture",
       imageSrc: "/images/applicationwheel/parentwheel/agriculture.png",
       children: [
-        { id: "seg-1-a", label: "Blueberries", imageSrc: "/images/applicationwheel/childagriculture/blueberries.png" },
+        { id: "seg-1-a", label: "Blueberries", imageSrc: "/images/applicationwheel/childagriculture/blueberries.png", disabled: true },
         { id: "seg-1-b", label: "Cherries", imageSrc: "/images/applicationwheel/childagriculture/cherries.png" },
         { id: "seg-1-c", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/corn.png" },
         { id: "seg-1-d", label: "Coming Soon", imageSrc: "/images/applicationwheel/childagriculture/grapes.png" },

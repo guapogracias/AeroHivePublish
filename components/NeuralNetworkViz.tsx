@@ -325,15 +325,15 @@ export default function NeuralNetworkViz({
               ))}
             </div>
             <div
-              className={`border border-[#10b98155] bg-[#10b9811f] ${
+              className={`border border-[var(--divider)] bg-[var(--surface-1)] ${
                 isCompact ? "mt-2 p-2.5 rounded-md" : "mt-3 p-3 rounded-lg"
               }`}
             >
-              <div className={`text-[#059669] font-medium ${isCompact ? "text-[12px] mb-0.5" : "mb-1"}`}>
+              <div className={`text-[var(--text-muted)] font-medium ${isCompact ? "text-[12px] mb-0.5" : "mb-1"}`}>
                 Identified as:
               </div>
               <div className={`text-[var(--text-primary)] ${isCompact ? "text-xl" : "text-2xl"}`}>Car</div>
-              <div className={`text-[#059669] ${isCompact ? "text-[12px] mt-0.5" : "text-sm mt-1"}`}>
+              <div className={`text-[var(--text-muted)] ${isCompact ? "text-[12px] mt-0.5" : "text-sm mt-1"}`}>
                 92% confidence
               </div>
             </div>

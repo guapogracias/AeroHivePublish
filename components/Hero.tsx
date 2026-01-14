@@ -3,44 +3,67 @@ import DroneSwarmASCII from "./DroneSwarmASCII";
 export default function Hero() {
   return (
     <section className="relative w-full min-h-[100vh] grid-bg overflow-hidden border-b border-[var(--divider)]">
-      {/* Container with max-width and padding */}
-      <div className="container-main relative h-full min-h-[100vh]">
+      {/* Full-width container (fill desktop viewport) */}
+      <div className="relative h-full min-h-[100vh] w-full px-6 md:px-16">
         {/* Mobile: 2-column grid, Desktop: 4-column grid */}
         <div 
           className="hero-grid relative grid h-full min-h-[100vh]"
         >
-          {/* Mobile: 3 vertical dotted lines, Desktop: 5 vertical dotted lines */}
-          {/* Left border line */}
-          <div className="absolute left-0 top-0 bottom-0 dotted-line" />
-          
-          {/* Divider after column 1 - Mobile: 50%, Desktop: 25% */}
-          <div className="absolute left-[50%] md:left-[25%] top-0 bottom-0 dotted-line" />
-          
-          {/* Divider after column 2 - Desktop only: 50% */}
-          <div className="hidden md:block absolute left-[50%] top-0 bottom-0 dotted-line" />
-          
-          {/* Divider after column 3 - Desktop only: 75% */}
-          <div className="hidden md:block absolute left-[75%] top-0 bottom-0 dotted-line" />
-          
-          {/* Right border line */}
-          <div className="absolute right-0 top-0 bottom-0 dotted-line" />
-
           {/* Swarm background (full-screen) */}
           <div className="absolute inset-0 z-0 pointer-events-none">
             <DroneSwarmASCII />
           </div>
           
-          {/* Centered title/subtitle */}
-          <div className="col-span-2 md:col-span-4 flex flex-col items-center justify-center min-h-[100vh] relative z-10 px-4">
-            {/* Title (same sizing as the previous main heading) */}
-            <h1 className="text-[48px] leading-[56px] tracking-[-1.5px] md:text-[84px] md:leading-[92px] md:tracking-[-2.94px] font-medium text-[var(--text-primary)] text-center mb-6 md:mb-8 max-w-4xl px-4 md:px-0">
-              AeroHive
-            </h1>
-            
-            {/* Subheading */}
-            <p className="text-[22px] leading-[30px] tracking-[-0.2px] md:text-[32px] md:leading-[40px] md:tracking-[-0.6px] text-[var(--text-primary)] text-center max-w-2xl opacity-80">
-              Be Everywhere
-            </p>
+          {/* Left-aligned cover overlay (temporary copy; you’ll replace later) */}
+          <div className="absolute inset-0 z-10">
+            <div className="relative h-full min-h-[100vh]">
+              {/* Headline + subcopy */}
+              <div className="absolute left-0 top-[22%] md:top-[26%] -translate-y-[192px] max-w-[720px]">
+                <h1 className="relative text-black font-medium text-[48px] leading-[54px] md:text-[76px] md:leading-[82px] tracking-[-1.5px] md:tracking-[-2.2px]">
+                  Aerial accounting
+                  <br />
+                  for the <span className="text-emerald-500">physical world</span>
+                </h1>
+                <p className="relative mt-5 text-black/75 text-[14px] leading-[20px] md:text-[16px] md:leading-[22px] max-w-[520px]">
+                  AeroHive keeps a running record of what’s on the ground and how it changes over time, so problems can be seen early and decisions can be made with confidence.
+                </p>
+              </div>
+
+              {/* Bottom cards (horizontal scroll) */}
+              <div className="absolute left-0 right-0 bottom-[10%] md:bottom-[8%] -translate-y-[96px]">
+                <div className="flex justify-center gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory px-2 md:px-0">
+                  {[
+                    {
+                      title: "1. Where",
+                      body:
+                        "We show what exists and where it is. AeroHive creates a clear map of assets and conditions that stays consistent over time.",
+                    },
+                    {
+                      title: "2. Why",
+                      body:
+                        "Because change creates risk. By comparing what’s happening now to what happened before, AeroHive surfaces issues before they become expensive.",
+                    },
+                    {
+                      title: "3. How",
+                      body:
+                        "By collecting data automatically and analyzing it with AI. Repeated flights turn real-world change into clear signals that guide action.",
+                    },
+                  ].map((card) => (
+                    <div
+                      key={card.title}
+                      className="snap-start shrink-0 w-[300px] md:w-[360px] rounded-xl bg-white/55 backdrop-blur-sm border border-black/10 p-6"
+                    >
+                      <div className="text-black font-medium text-[22px] leading-[28px]">
+                        {card.title}
+                      </div>
+                      <div className="mt-3 text-black/70 text-[12px] leading-[18px]">
+                        {card.body}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

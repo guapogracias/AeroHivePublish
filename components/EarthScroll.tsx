@@ -32,16 +32,17 @@ const CAMERA_PRESETS: Record<string, { position: [number, number, number]; lookA
 };
 
 const systemSections: Section[] = [
+  // Section 01
   {
     id: "section-01",
     type: "content",
     caption: "Section 01",
     title: "Natural Language Control",
     content:
-      "Users can describe missions in any language, and those instructions are converted into drone-ready commands using PX4, ensuring safe and regulation-compliant operation. The system connects user intent directly to flight behavior without manual configuration. This makes complex missions easy to launch and repeat.",
+      "Users describe what they want to account for, not how to fly. AeroHive translates user intent into consistent, regulation-compliant flight behavior using PX4. This ensures missions are executed the same way every time, removing manual configuration and operator variability. Consistency at this layer is what makes spatial data comparable across time.",
   },
   {
-    id: "component-01",
+    id: "component-01-01",
     type: "component",
     caption: "Component 01.01",
     title: "PX4",
@@ -54,19 +55,21 @@ const systemSections: Section[] = [
       distance: 2,
     },
   },
+
+  // Section 02
   {
     id: "section-02",
     type: "content",
     caption: "Section 02",
-    title: "Coordinated & Scalable Operations",
+    title: "Coordinated, Autonomous & Scalable Operations",
     content:
-      "Flight paths are automatically planned to maximize coverage while adapting drone formations to the task. Jetson Nano enables onboard coordination and decision-making, allowing multiple drones to operate together efficiently without overlap. This architecture scales smoothly from small deployments to large-area operations.",
+      "Jetson is the onboard intelligence layer that protects the integrity of AeroHive’s accounting system. It processes incoming sensor data in real time, coordinates multiple drones, and makes autonomous decisions during flight to maintain coverage, spacing, and data quality. Ensures the spatial record remains continuous and comparable even when environments are dynamic.",
   },
   {
-    id: "component-02",
+    id: "component-02-01",
     type: "component",
     caption: "Component 02.01",
-    title: "Jetson",
+    title: "Jetson - Coordination",
     content: "",
     layerName: "Jetson",
     media: { type: "video", src: "/videos/Jetson.mp4" },
@@ -77,18 +80,35 @@ const systemSections: Section[] = [
     },
   },
   {
+    id: "component-02-02",
+    type: "component",
+    caption: "Component 02.02",
+    title: "Jetson - Autonomy",
+    content:
+      "Jetson enables drones to adapt flight paths, avoid obstacles, and respond to environmental changes without breaking mission structure. Rather than just optimizing for speed or independence, autonomy is used to preserve consistency in how data is collected. This ensures the accounting process does not degrade when conditions change.",
+    layerName: "Jetson",
+    media: undefined,
+    cameraConfig: {
+      position: [0.5, 2, 1.5],
+      lookAtOffset: [0, 0, 0],
+      distance: 1.8,
+    },
+  },
+
+  // Section 03
+  {
     id: "section-03",
     type: "content",
     caption: "Section 03",
-    title: "Camera & Sensing Framework",
+    title: "Camera & Semantic Accounting",
     content:
-      "Using computer vision, the system processes camera data in real time to recognize user-defined objects trained from example images or online datasets. This allows drones to detect and focus on specific targets or features during flight. Recognition improves as more labeled data is added over time.",
+      "Computer vision allows AeroHive to understand what it is seeing while a mission is in progress. Instead of collecting everything equally, the system identifies relevant objects, features, and conditions in real time and uses that information to guide how data is captured. This ensures the most important areas receive the right level of attention during flight.",
   },
   {
-    id: "component-03",
+    id: "component-03-01",
     type: "component",
     caption: "Component 03.01",
-    title: "Camera System",
+    title: "Detection System",
     content: "",
     layerName: "camera",
     media: { type: "video", src: "/videos/CV.mp4" },
@@ -98,14 +118,13 @@ const systemSections: Section[] = [
       distance: 1.5,
     },
   },
-  // CV components (placeholders; adjust content/camera as needed)
   {
-    id: "component-cv-01",
+    id: "component-03-02",
     type: "component",
     caption: "Component 03.02",
-    title: "CV Part 1",
+    title: "User-Defined Recognition",
     content:
-      "Users can upload their own images to define what they want the system to recognize. A set of example photos across angles, distances, and lighting helps the model learn the patterns that matter instead of relying on fixed, predefined categories.",
+      "Users upload example images to define what the system should recognize. By learning from real-world examples across angles, distances, and lighting, AeroHive avoids fixed categories and adapts to specific environments. This allows assets and features to be identified consistently across flights, forming stable records rather than one-off detections.",
     layerName: "camera",
     media: undefined,
     cameraConfig: {
@@ -115,24 +134,10 @@ const systemSections: Section[] = [
     },
   },
   {
-    id: "component-cv-02",
+    id: "component-03-03",
     type: "component",
     caption: "Component 03.03",
-    title: "CV Part 2",
-    content: "Example video feed demonstrating the recognition pipeline.",
-    layerName: "camera",
-    media: { type: "video", src: "/videos/CV.mp4" },
-    cameraConfig: {
-      position: [1.5, 0.5, 2],
-      lookAtOffset: [0, 0, 0],
-      distance: 1.5,
-    },
-  },
-  {
-    id: "component-cv-03",
-    type: "component",
-    caption: "",
-    title: "",
+    title: "Neural Network Diagram",
     content: "",
     layerName: "camera",
     media: { type: "diagram" },
@@ -143,12 +148,12 @@ const systemSections: Section[] = [
     },
   },
   {
-    id: "component-cv-04",
+    id: "component-03-04",
     type: "component",
-    caption: "Component 03.05",
-    title: "CV Part 4",
+    caption: "Component 03.04",
+    title: "In-Flight Visual Actions",
     content:
-      "Once trained on those examples, the drone uses its onboard sensors and cameras to identify the same patterns during flight. As it scans an area, the system matches what it sees against the uploaded references in real time, allowing it to detect, locate, and map user-defined items such as that specific car directly within the environment. Because detections are tied to spatial data, identified items are placed precisely on the map and can be tracked across passes, making it possible to see where they appear, when they were last observed, and how their surroundings or condition change over time.",
+      "Because recognition happens during flight, AeroHive can respond immediately to what it sees. Detected objects and conditions influence mission behavior in real time: closer inspection, adjusting flight paths, prioritizing coverage, or marking areas for follow-up. At the same time, recognized items are anchored to precise locations in the spatial map. This allows AeroHive to both act in the moment and maintain a durable record of when assets appear, where they move, and how their surroundings change over time.",
     layerName: "camera",
     media: undefined,
     cameraConfig: {
@@ -157,25 +162,26 @@ const systemSections: Section[] = [
       distance: 1.5,
     },
   },
+
+  // Section 04
   {
     id: "section-04",
     type: "content",
     caption: "Section 04",
-    title: "Autonomous Decision Making",
+    title: "Point Clouds & Structural Accounting",
     content:
-      "The onboard AI processes environmental data to make real-time decisions during flight. Drones can adapt to changing conditions, avoid obstacles, and optimize their paths without human intervention. This enables truly autonomous operations in dynamic and unpredictable environments.",
+      "Point clouds are the foundation of AeroHive’s accounting system. By capturing the full geometry of the environment, they create a quantitative record of structure rather than appearance. Unlike photos, which depend on viewpoint and interpretation, point clouds measure distance, height, volume, and spacing directly, allowing environments to be compared consistently over time. This enables AeroHive to record how much exists, how it is shaped, and how it is changing, not just what it looks like.",
   },
   {
-    id: "component-04",
+    id: "component-04-01",
     type: "component",
     caption: "Component 04.01",
-    title: "LiDAR",
-    content:
-      "Because a point cloud captures structure rather than appearance, the environment becomes something that can be measured instead of merely viewed. Distances, volumes, canopy height, slope, spacing, and terrain variation can be calculated directly, removing the need for visual estimation or manual interpretation.",
+    title: "Single Photo vs Point Cloud",
+    content: "",
     layerName: "LiDAR",
-    media: undefined,
+    media: { type: "slider" },
     cameraConfig: {
-      position: [2, 1, 1.5],
+      position: [2, 3, 1.5],
       lookAtOffset: [0, 0, 0],
       distance: 1.8,
     },
@@ -184,23 +190,9 @@ const systemSections: Section[] = [
     id: "component-04-02",
     type: "component",
     caption: "Component 04.02",
-    title: "Single Photo vs Point Cloud",
-    content: "",
-    media: { type: "slider" },
-    layerName: "LiDAR",
-    cameraConfig: {
-      position: [2, 3, 1.5],
-      lookAtOffset: [0, 0, 0],
-      distance: 1.8,
-    },
-  },
-  {
-    id: "component-04-03",
-    type: "component",
-    caption: "Component 04.03",
-    title: "LiDAR Part 3",
+    title: "Change Reconciliation",
     content:
-      "That same structural record makes change detectable over time. By aligning scans collected on different dates, growth, loss, movement, or deformation can be identified with precision that photos or human observation cannot reliably achieve, producing a consistent and objective representation that software can analyze the same way across locations and seasons.",
+      "LiDAR scans collected on different dates can be aligned because they measure the same physical structure each time. Enabled by PX4’s consistent flight execution, this allows AeroHive to reconcile new scans against historical records. Growth, loss, deformation, and movement become measurable deltas rather than subjective judgments. This is how AeroHive identifies abnormal change, emerging risk, and deviation from expected patterns.",
     layerName: "LiDAR",
     media: undefined,
     cameraConfig: {
@@ -210,11 +202,12 @@ const systemSections: Section[] = [
     },
   },
   {
-    id: "component-04-04",
+    id: "component-04-03",
     type: "component",
-    caption: "Component 04.04",
-    title: "LiDAR Part 4",
-    content: "LiDAR module: Part 4",
+    caption: "Component 04.03",
+    title: "System Deployment",
+    content:
+      "This video demonstrates how LiDAR data is generated during flight and integrated into AeroHive’s system. Repeated deployments build a structural history of the environment, allowing software to analyze trends and forecast future conditions based on measured change.",
     layerName: "LiDAR",
     media: { type: "video", src: "/videos/LiDAR.webm" },
     cameraConfig: {
@@ -324,7 +317,8 @@ export function EarthScroll() {
     isComponentSection(currentSystemSection) &&
     currentSystemSection.media?.type === "slider";
   const [suppressFocus, setSuppressFocus] = useState(false);
-  const lastWheelRef = useRef(0);
+  const wheelAccumRef = useRef(0);
+  const wheelDirRef = useRef<1 | -1>(1);
   const activeCameraPreset =
     currentLayer === 2 &&
     focusStage !== "idle" &&
@@ -404,13 +398,26 @@ export function EarthScroll() {
   useEffect(() => {
     if (currentLayer !== 2 || focusStage === "idle") return;
     const handleWheel = (e: WheelEvent) => {
-      if (Math.abs(e.deltaY) < 5) return;
-      const now = performance.now();
-      if (now - lastWheelRef.current < 600) return; // throttle rapid switching
-      lastWheelRef.current = now;
+      if (Math.abs(e.deltaY) < 1) return;
+      const threshold = 250;
+      const dir: 1 | -1 = e.deltaY > 0 ? 1 : -1;
+
+      // Reset accumulation when direction flips (feels more natural on trackpads).
+      if (wheelDirRef.current !== dir) {
+        wheelDirRef.current = dir;
+        wheelAccumRef.current = 0;
+      }
+
+      wheelAccumRef.current += e.deltaY;
+      const steps = Math.floor(Math.abs(wheelAccumRef.current) / threshold);
+      if (steps <= 0) return;
+
+      // Consume the portion that we used to produce steps; keep remainder for smoothness.
+      wheelAccumRef.current -= steps * threshold * dir;
+
       const isLast = currentSystemIndex === systemSections.length - 1;
       const isFirst = currentSystemIndex === 0;
-      if (e.deltaY > 0 && isLast) {
+      if (dir > 0 && isLast) {
         // advance to ground layer and reset focus
         setCurrentLayer(3);
         setFocusStage("idle");
@@ -419,7 +426,7 @@ export function EarthScroll() {
         setSuppressFocus(true);
         return;
       }
-      if (e.deltaY < 0 && isFirst) {
+      if (dir < 0 && isFirst) {
         // exit back to swarm
         setFocusStage("idle");
         setFocusedIndex(null);
@@ -427,7 +434,7 @@ export function EarthScroll() {
         return;
       }
       setCurrentSystemIndex((idx) => {
-        const next = e.deltaY > 0 ? idx + 1 : idx - 1;
+        const next = idx + dir * steps;
         return Math.min(Math.max(next, 0), systemSections.length - 1);
       });
     };
@@ -507,8 +514,8 @@ export function EarthScroll() {
 
         {/* Drone layer title (matches System page). Shown only during swarm view, hidden when overlay cards show. */}
         {currentLayer === 2 && focusStage === "idle" && (
-          <div className="absolute top-[80px] left-[4%] md:left-[5%] z-30 pointer-events-none">
-            <h2 className="text-h1 text-[var(--text-primary)]">Our Drone Model</h2>
+          <div className="absolute top-[176px] left-[4%] md:left-[5%] z-30 pointer-events-none">
+            <h2 className="text-h1 text-white">Our Drone Model</h2>
           </div>
         )}
 
@@ -541,6 +548,7 @@ export function EarthScroll() {
                     return (
                     <SectionBlock
                       key={currentSystemSection.id}
+                      variant="dark"
                       caption={currentSystemSection.caption}
                       title={currentSystemSection.title}
                       content={currentSystemSection.content}
@@ -615,13 +623,13 @@ export function EarthScroll() {
               return (
                 <div
                   key={l.id}
-                  className="flex items-center gap-4 transition-all duration-500"
+                  className="flex items-center justify-end gap-4 transition-all duration-500"
                   style={{
                     opacity: isPast ? 0.4 : isActive ? 1 : 0.6,
                     transform: isActive ? "scale(1.1)" : "scale(1)",
                   }}
                 >
-                  <div className="text-right">
+                  <div className="text-right w-[140px]">
                     <div className="text-xs font-mono text-white/70">{l.altitude}</div>
                     <div
                       className={`text-sm font-bold transition-all ${
@@ -634,7 +642,11 @@ export function EarthScroll() {
                   <div className={`p-2 rounded-lg transition-all ${isActive ? "bg-white/20" : "bg-white/5"}`}>
                     <LayerIcon className={`w-5 h-5 transition-all ${isActive ? "text-white" : "text-white/50"}`} />
                   </div>
-                  <div className={`h-0.5 transition-all ${isActive ? "w-16 bg-white" : "w-8 bg-white/30"}`} />
+                  <div
+                    className={`h-0.5 transition-all ${
+                      isActive ? "w-14 bg-white" : "w-10 bg-white/30"
+                    }`}
+                  />
                 </div>
               );
             })}

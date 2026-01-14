@@ -20,7 +20,8 @@ const HIGHLIGHT_CONFIG = {
   maxIntensity: 0.8,
   pulseSpeed: 0.4,
   rotationSpeed: 0.05,
-  cameraLerpSpeed: 0.02, // Slower for smoother, longer transitions
+  // Camera smoothing is time-based (see useFrame). Higher = faster settle.
+  cameraLerpSpeed: 5.0,
 };
 
 const LAYER_NAMES = ["camera", "LiDAR", "PX4", "Jetson"];
@@ -185,13 +186,41 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
   const { camera } = useThree();
   const pivotRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
+  // IMPORTANT: never mutate the cached GLTF `scene` from useGLTF.
+  // Other parts of the app (e.g. swarm drones) reuse that cache.
+  const modelScene = useMemo(() => scene.clone(true), [scene]);
+
+  // Clone materials once so any highlight mutations stay local to this component.
+  useEffect(() => {
+    const created: THREE.Material[] = [];
+
+    modelScene.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+      if (!child.material) return;
+
+      const mats = Array.isArray(child.material) ? child.material : [child.material];
+      const cloned = mats.map((m) => {
+        const c = m.clone();
+        created.push(c);
+        return c;
+      });
+
+      child.material = Array.isArray(child.material) ? cloned : cloned[0];
+    });
+
+    return () => {
+      // restore any temporary overrides (safe: only touches modelScene)
+      restoreAnyHighlightedMeshes(modelScene);
+      created.forEach((m) => m.dispose());
+    };
+  }, [modelScene]);
 
   // Cache layer data once on mount
   const layerCache = useMemo(() => {
     const cache = new Map<string, LayerData>();
     
     LAYER_NAMES.forEach((name) => {
-      const obj = scene.getObjectByName(name);
+      const obj = modelScene.getObjectByName(name);
       if (!obj) return;
 
       const meshes: THREE.Mesh[] = [];
@@ -211,14 +240,14 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
     });
 
     return cache;
-  }, [scene]);
+  }, [modelScene]);
 
   // Calculate model center and setup positioning
   const modelCenter = useMemo(() => {
-    const box = new THREE.Box3().setFromObject(scene);
+    const box = new THREE.Box3().setFromObject(modelScene);
     const center = box.getCenter(new THREE.Vector3());
     return center.multiplyScalar(MODEL_SCALE);
-  }, [scene]);
+  }, [modelScene]);
 
   // Current highlight state
   const highlightState = useRef<{
@@ -262,7 +291,7 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
   useEffect(() => {
     // Restore any previously-highlighted meshes, regardless of which layer they came from.
     // This prevents "stuck blue" if state ever desyncs.
-    restoreAnyHighlightedMeshes(scene);
+    restoreAnyHighlightedMeshes(modelScene);
 
     // Clear state
     highlightState.current.modifiedMaterials = [];
@@ -379,7 +408,7 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
 
       targetRotation.current.set(0, Math.atan2(-direction.x, -direction.z), 0);
     }
-  }, [focusLayer, layerCache, modelCenter, camera]);
+  }, [focusLayer, layerCache, modelCenter, camera, modelScene]);
 
   // Dev helper: press "P" to print the current camera pose to the console.
   // Use it to capture a perfect view for hardcoding into LAYER_CAMERA_POSITIONS.
@@ -438,7 +467,8 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
     pivotRef.current.rotation.copy(currentRotation.current);
 
     // Animate camera position and rotation with smooth, longer transitions
-    camera.position.lerp(targetCameraPosition.current, HIGHLIGHT_CONFIG.cameraLerpSpeed);
+    const camT = 1 - Math.exp(-HIGHLIGHT_CONFIG.cameraLerpSpeed * Math.min(delta, 1 / 30));
+    camera.position.lerp(targetCameraPosition.current, camT);
     
     // Smoothly interpolate rotation with angle wrapping
     const lerpAngle = (current: number, target: number, t: number) => {
@@ -449,14 +479,14 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
     };
     
     camera.rotation.set(
-      lerpAngle(camera.rotation.x, targetCameraRotation.current.x, HIGHLIGHT_CONFIG.cameraLerpSpeed),
-      lerpAngle(camera.rotation.y, targetCameraRotation.current.y, HIGHLIGHT_CONFIG.cameraLerpSpeed),
-      lerpAngle(camera.rotation.z, targetCameraRotation.current.z, HIGHLIGHT_CONFIG.cameraLerpSpeed)
+      lerpAngle(camera.rotation.x, targetCameraRotation.current.x, camT),
+      lerpAngle(camera.rotation.y, targetCameraRotation.current.y, camT),
+      lerpAngle(camera.rotation.z, targetCameraRotation.current.z, camT)
     );
 
     // Smoothly interpolate FOV
     if (camera instanceof THREE.PerspectiveCamera) {
-      camera.fov += (targetCameraFov.current - camera.fov) * HIGHLIGHT_CONFIG.cameraLerpSpeed;
+      camera.fov += (targetCameraFov.current - camera.fov) * camT;
       camera.updateProjectionMatrix();
     }
   });
@@ -464,7 +494,7 @@ function Model({ focusLayer }: { focusLayer?: string | null }) {
   return (
     <group ref={pivotRef}>
       <group ref={modelRef}>
-        <primitive object={scene} scale={MODEL_SCALE} />
+        <primitive object={modelScene} scale={MODEL_SCALE} />
       </group>
     </group>
   );

@@ -15,6 +15,7 @@ interface SectionBlockProps {
   onNext?: () => void;
   canGoBack?: boolean;
   canGoNext?: boolean;
+  variant?: "light" | "dark";
 }
 
 export default function SectionBlock({
@@ -26,13 +27,15 @@ export default function SectionBlock({
   onNext,
   canGoBack = false,
   canGoNext = false,
+  variant = "light",
 }: SectionBlockProps) {
   const isDiagram = media?.type === "diagram";
+  const isDark = variant === "dark";
 
   return (
     <div>
       {caption ? (
-        <h3 className="text-h3 text-[var(--text-primary)] mb-3">
+        <h3 className={`text-h3 mb-3 ${isDark ? "text-white" : "text-[var(--text-primary)]"}`}>
           <DecryptedText
             text={caption}
             animateOn="view"
@@ -40,18 +43,20 @@ export default function SectionBlock({
             speed={40}
             maxIterations={15}
             sequential={true}
+            className={isDark ? "text-white" : ""}
+            encryptedClassName={isDark ? "text-white/60" : ""}
           />
         </h3>
       ) : null}
 
       {title ? (
-        <p className="text-h2 text-[var(--text-primary)] mb-4">
+        <p className={`text-h2 mb-4 ${isDark ? "text-white" : "text-[var(--text-primary)]"}`}>
           {title}
         </p>
       ) : null}
 
       {content ? (
-        <p className="text-body-md text-[var(--text-secondary)] mb-6">
+        <p className={`text-body-md mb-6 ${isDark ? "text-white/90" : "text-[var(--text-secondary)]"}`}>
           {content}
         </p>
       ) : null}
@@ -107,7 +112,28 @@ export default function SectionBlock({
       ) : null}
 
       {media?.type === "diagram" ? (
-        <div className="mb-6 rounded-lg border border-[var(--divider)] bg-[var(--surface-1)] p-1 overflow-hidden max-h-[380px] md:max-h-[420px]">
+        <div
+          className={`mb-6 rounded-lg p-1 overflow-hidden max-h-[380px] md:max-h-[420px] ${
+            isDark
+              ? "bg-transparent"
+              : "border-[var(--divider)] bg-[var(--surface-1)]"
+          }`}
+          style={
+            isDark
+              ? ({
+                  // Make NeuralNetworkViz inherit the same "black glass" as the containing textbox:
+                  // - Remove inner panel fills (surface tokens) so the parent's bg shows through
+                  // - Flip text tokens to white for readability on dark
+                  ["--surface-1" as any]: "rgba(0,0,0,0)",
+                  ["--surface-2" as any]: "rgba(0,0,0,0)",
+                  ["--divider" as any]: "rgba(255,255,255,0.12)",
+                  ["--text-primary" as any]: "rgba(255,255,255,0.95)",
+                  ["--text-secondary" as any]: "rgba(255,255,255,0.82)",
+                  ["--text-muted" as any]: "rgba(255,255,255,0.60)",
+                } as React.CSSProperties)
+              : undefined
+          }
+        >
           <div style={{ zoom: 0.75 }}>
             <NeuralNetworkViz variant="compact" />
           </div>
@@ -117,9 +143,9 @@ export default function SectionBlock({
       {/* Navigation controls */}
       {(onBack || onNext) && (
         <div
-          className={`flex items-center gap-6 text-[var(--text-primary)] border-t border-[var(--divider)] ${
+          className={`flex items-center gap-6 border-t border-[var(--divider)] ${
             isDiagram ? "pt-2" : "pt-4"
-          }`}
+          } ${isDark ? "text-white" : "text-[var(--text-primary)]"}`}
         >
           {onBack && (
             <button
