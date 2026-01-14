@@ -33,10 +33,9 @@ export default function ContactSection({ id = "contact" }: { id?: string }) {
     <section
       id={id}
       className="relative w-full grid-bg border-y border-[var(--divider)]"
-      style={{ minHeight: "calc(100vh - 64px)" }}
     >
-      <div className="container-main relative w-full h-full flex items-center">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-8 md:py-10 w-full">
+      <div className="container-main relative w-full">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-10 pb-4 md:pt-12 md:pb-6 w-full">
           <div className="col-span-2 md:col-span-2 px-4">
             <h1 className="text-[40px] leading-[48px] tracking-[-1.8px] md:text-[48px] md:leading-[56px] md:tracking-[-2.2px] font-medium text-[var(--text-primary)] mb-3">
               Contact Us
@@ -63,7 +62,7 @@ export default function ContactSection({ id = "contact" }: { id?: string }) {
               {TEAM_CONTACTS.map((person) => (
                 <div
                   key={person.email}
-                  className="w-full rounded-xl border border-[var(--divider)] bg-white/5 overflow-hidden"
+                  className="w-full rounded-xl border border-[var(--divider)] bg-white overflow-hidden"
                 >
                   <div className="flex flex-col sm:flex-row">
                     <div className="relative w-full sm:w-[132px] h-[160px] sm:h-auto shrink-0">

@@ -34,6 +34,9 @@
   --wheel-fill: rgba(17, 24, 39, 0.06);
   --wheel-text: rgba(17, 24, 39, 0.78);
 
+  /* Brand */
+  --brand-yellow: #f4ad2d;
+
   /* Layout */
   --container-max: 1088px;
   --container-padding: 16px;

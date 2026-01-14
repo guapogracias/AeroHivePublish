@@ -16,7 +16,7 @@ export default function ApplicationSection({
       style={{ minHeight: "calc(100vh - 64px)" }}
     >
       {showBackground ? (
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none z-0">
           <div
             className="absolute inset-0"
             style={{

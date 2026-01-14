@@ -24,14 +24,24 @@ export default function Header() {
         <div className="header-grid relative grid items-center h-[54px]">
           {/* Logo - Column 1 */}
           <div className="flex items-center">
-            <Link href="/" className="flex items-center gap-2 px-4">
+            <Link href="/" className="flex items-center gap-2 pl-2 pr-2 md:pl-0 md:pr-0">
               <Image
-                src="/images/logo.svg"
+                src="/images/logo.png"
                 alt="AeroHive Logo"
-                width={48}
-                height={48}
-                className="h-12 w-auto"
+                // Match the PNG's aspect ratio (774x322) to avoid distortion/blurry scaling.
+                width={154}
+                height={64}
+                quality={100}
+                priority
+                className="h-7 md:h-8 w-auto"
               />
+              <div
+                className="hidden sm:block text-[20px] md:text-[22px] leading-none font-semibold tracking-[-0.6px]"
+                style={{ fontFamily: "var(--font-inter)" }}
+              >
+                <span className="text-white">Aero</span>
+                <span className="text-[#f4ad2d]">Hive</span>
+              </div>
             </Link>
           </div>
 

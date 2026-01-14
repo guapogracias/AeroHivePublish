@@ -21,86 +21,92 @@ const DEFAULT_ITEMS: ShowcaseItem[] = [
   // Plan (3)
   {
     label: "Plan",
-    title: "Define operational boundaries",
+    title: "Set Boundaries",
     description:
-      "Set clear geographic limits for where work can and cannot happen, including exclusion zones, permissions, and areas of interest that guide all operations and ensure flights stay within approved areas.",
+      "Define where work can and cannot happen. Create clear zones and permissions so operations stay within approved areas.",
     imageSrc: "/images/features/1.boundaries.png",
     imageAlt: "Define operational boundaries",
   },
   {
     label: "Plan",
-    title: "Flight plans consider real-world conditions",
+    title: "Adapt to Conditions",
     description:
-      "Incorporate environmental and operational factors such as weather, terrain, obstacles, and site access before and during execution so missions adapt to real conditions rather than ideal assumptions.",
+      "Account for weather, terrain, obstacles, and access so missions adjust to real conditions, not ideal ones.",
     imageSrc: "/images/features/2.weather.png",
     imageAlt: "Real-world flight conditions",
   },
   {
     label: "Plan",
-    title: "Design reusable missions and data-collection workflows",
+    title: "Reuse Missions",
     description:
-      "Create repeatable templates that define how data is collected, which sensors are used, and what rules or constraints apply. Flight plans can be reused across locations or over time to ensure consistency and reduce setup effort.",
+      "Create repeatable flight templates so data is collected the same way across locations and over time.",
     imageSrc: "/images/features/3.reusablemission.png",
     imageAlt: "Reusable missions",
   },
   // Analyze (3)
   {
     label: "Analyze",
-    title: "Detect change over time across repeated scans",
+    title: "Track Change",
     description:
-      "Compare data from different points in time to reveal movement, growth, degradation, or other changes that would be difficult to detect through manual inspection or single snapshots.",
+      "Compare repeated scans to see growth, movement, or decline that single snapshots can’t reveal.",
     imageSrc: "/images/features/4.temporalchange.png",
     imageAlt: "Temporal change",
   },
   {
     label: "Analyze",
-    title: "Export flight data to machinery",
+    title: "Send to Equipment",
     description:
-      "Flight results can be exported as machine-readable prescription files that agricultural equipment can directly use. Disease zones, stress areas, and exclusion regions are converted into geofenced maps that tractors, sprayers, and other machinery can load to guide where and how work is performed. This allows insights captured from the air to translate into precise actions on the ground.",
+      "Turn results into files that machinery can use to guide where and how work is done.",
     imageSrc: "/images/features/5.exportXIOMSL.png",
     imageAlt: "Export to machinery",
   },
   {
     label: "Analyze",
-    title: "Maintain an inventory of assets",
+    title: "Track Assets",
     description:
-      "Every asset is assigned a persistent ID, allowing it to be consistently recognized across flights and over time. Users can label anything they care about and the system will continue to detect and track those assets even across repeated passovers. This makes it possible to locate assets, see when they were last observed, and understand how their condition has changed.",
+      "Assign persistent IDs so assets can be located and monitored consistently over time.",
     imageSrc: "/images/features/6.permanetID.png",
     imageAlt: "Persistent asset IDs",
   },
   // Act (3)
   {
     label: "Act",
-    title: "Set drone schedules to operate without oversight",
+    title: "Automate Flights",
     description:
-      "Schedule missions to run automatically at defined intervals or trigger conditions, reducing the need for constant manual control while ensuring coverage happens reliably and on time.",
+      "Schedule missions to run automatically, ensuring coverage happens on time without constant oversight.",
     imageSrc: "/images/features/7.setschedule.png",
     imageAlt: "Automated scheduling",
   },
   {
     label: "Act",
-    title: "Generated maps are simulated to find the optimal routes",
+    title: "Simulate Routes",
     description:
-      "Generated maps and task plans are simulated in advance to determine the most efficient and feasible routes, minimizing overlap, avoiding restricted areas, and reducing time and resource usage.",
+      "Test routes in advance to reduce overlap, avoid restricted areas, and save time and resources.",
     imageSrc: "/images/features/8.learning.png",
     imageAlt: "Route simulation",
   },
   {
     label: "Act",
-    title: "Compliance & Reporting",
+    title: "Generate Reports",
     description:
-      "Automatically generate regulatory, operational, and client-facing documentation including flight logs, audit records, inspection reports, and historical summaries to support transparency, accountability, and compliance.",
+      "Automatically produce logs, summaries, and compliance documentation from each operation.",
     imageSrc: "/images/features/9.compliance.png",
     imageAlt: "Compliance and reporting",
   },
 ];
 
 export default function ScrollShowcase({
-  heading = "Features",
+  heading = (
+    <>
+      World&apos;s <span className="text-emerald-500">most advanced</span>
+      <br />
+      farm management platform
+    </>
+  ),
   subheading,
   items = DEFAULT_ITEMS,
 }: {
-  heading?: string;
+  heading?: React.ReactNode;
   subheading?: string;
   items?: ShowcaseItem[];
 }) {
@@ -122,8 +128,9 @@ export default function ScrollShowcase({
   // and that scaled cards don't get clipped by the viewport.
   const CARD_GAP_PX = 16; // tighter gaps so cards can be wider (3-up)
   const GROUP_SIDE_PADDING_PX = 16; // keep cards wide, still avoid edge clipping
-  const TEXT_PANEL_H_PX = 220; // give more room to the image area (still enough for 3-4 lines of text)
-  const CARD_MAX_H_PX = 2000; // effectively uncapped on typical viewports (lets cards fill the stage)
+  // Match the smaller reference cards: keep a large image area but don't let cards fill the whole stage.
+  const TEXT_PANEL_H_PX = 160;
+  const CARD_MAX_H_PX = 680;
   const ACTIVE_SCALE = 1.02;
   const INACTIVE_SCALE = 0.99;
   // When the active card scales up, we need a little extra breathing room so it never clips.
@@ -266,7 +273,7 @@ export default function ScrollShowcase({
               </div>
 
               {/* Pill nav (like the reference) */}
-              <div className="flex items-center gap-2 bg-[var(--surface-1)] border border-[var(--divider)] rounded-full p-1.5 w-fit">
+              <div className="flex items-center gap-2 bg-white border border-[var(--divider)] rounded-full p-1.5 w-fit md:-translate-y-[24px]">
                 {(["Plan", "Analyze", "Act"] as const).map((label) => {
                   const isActive = activeCategory === label;
                   return (
@@ -292,7 +299,7 @@ export default function ScrollShowcase({
             <div className="flex-1 flex items-stretch min-h-0 pt-3 md:pt-3">
               <div
                 ref={frameRef}
-                className="w-full flex-1 overflow-visible"
+                className="mx-auto w-full flex-1 overflow-visible md:flex-none md:w-[71.428vw]"
                 style={{
                   paddingLeft: GROUP_SIDE_PADDING_PX,
                   paddingRight: GROUP_SIDE_PADDING_PX,
@@ -309,7 +316,7 @@ export default function ScrollShowcase({
               // Use nearly the full available rail height (lets the 3 cards "take up the screen").
               const cardH = stageH
                 ? Math.max(
-                    420,
+                    540,
                     Math.min(CARD_MAX_H_PX, Math.floor(stageH - ACTIVE_CLIP_SAFETY_PX))
                   )
                 : undefined;
@@ -358,7 +365,7 @@ export default function ScrollShowcase({
                           className={[
                             // NOTE: don't clip the whole card — only clip the image area —
                             // so longer descriptions never get cut off.
-                            "rounded-xl border bg-[var(--surface-1)] flex flex-col",
+                            "rounded-xl border bg-neutral-100 flex flex-col",
                             isActive ? "border-[var(--wheel-stroke)]" : "border-[var(--divider)]",
                             "transition-transform duration-300 ease-out",
                           ].join(" ")}
@@ -370,7 +377,7 @@ export default function ScrollShowcase({
                             transform: `scale(${isActive ? ACTIVE_SCALE : INACTIVE_SCALE})`,
                           }}
                         >
-                          <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-white">
+                          <div className="relative w-full flex-1 overflow-hidden rounded-t-xl bg-neutral-100">
                             {item.imageSrc ? (
                               <Image
                                 src={item.imageSrc}

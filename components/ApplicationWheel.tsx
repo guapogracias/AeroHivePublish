@@ -172,6 +172,7 @@ export default function ApplicationWheel({
 }) {
   const [path, setPath] = useState<WheelNode[]>([tree]);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [showCherryModal, setShowCherryModal] = useState(false);
 
   const node = path[path.length - 1];
   const segments = node.children ?? [];
@@ -189,6 +190,10 @@ export default function ApplicationWheel({
   }, []);
 
   const onSegmentClick = (seg: WheelNode) => {
+    if (seg.id === "seg-1-b") {
+      setShowCherryModal(true);
+      return;
+    }
     if (seg.children && seg.children.length > 0) {
       setPath((prev) => [...prev, seg]);
     }
@@ -390,6 +395,58 @@ export default function ApplicationWheel({
           ))}
         </div>
       </div>
+      {showCherryModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="relative bg-[var(--bg-primary)] text-[var(--text-primary)] rounded-2xl shadow-2xl border border-[var(--divider)] max-w-lg w-[90%] p-6">
+            <button
+              onClick={() => setShowCherryModal(false)}
+              className="absolute top-3 right-3 text-sm px-3 py-1 rounded-md bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--divider)] hover:bg-[var(--bg-hover)] transition"
+            >
+              Back
+            </button>
+            <h3 className="text-xl font-semibold mb-3">Cherries</h3>
+            <div className="space-y-3 text-sm leading-relaxed text-[var(--text-secondary)] max-h-[60vh] overflow-auto pr-1">
+              <p>
+                Michigan produces roughly 70% of the United States’ tart cherries, making it the backbone of domestic cherry supply.
+                Cherry orchards are perennial, capital-intensive assets that take years to establish and only generate value if disease
+                and weather risks are managed precisely. In recent seasons, growers have faced rising pressure from weather-driven disease,
+                higher labor costs, and tighter margins. USDA forecasts indicate that up to 40% of cherry yields can be lost in a single year
+                due to weather-borne disease, making cherries one of the highest-risk specialty crops in U.S. agriculture.
+              </p>
+              <p className="font-semibold text-[var(--text-primary)]">The Problem on the Ground</p>
+              <p>
+                Michigan cherry growers already have machinery, sprayers, and satellite imagery. What they lack is a reliable way to understand
+                where disease begins, how it spreads, and whether past treatments actually worked. Current practices rely on slow and subjective
+                manual scouting, satellite imagery that is too coarse and infrequent, and blanket spraying that wastes inputs while still missing
+                disease hotspots. The result is higher costs, environmental damage, and late discovery of problems that can impact multiple future
+                seasons. The core issue is not execution, but lack of accounting.
+              </p>
+              <p className="font-semibold text-[var(--text-primary)]">Introducing Aerial Accounting to the Orchard</p>
+              <p>
+                AeroHive treats the orchard as a system that can be measured, recorded, and reconciled over time. Autonomous drone flights repeatedly
+                survey the same cherry blocks at tree-level resolution. Each flight updates a spatial record of tree locations, canopy structure, and
+                areas of stress or disease, along with how those conditions change after weather events or treatment. Instead of isolated snapshots,
+                growers gain a living record of the orchard, allowing the system to distinguish normal seasonal variation from abnormal change that
+                signals risk.
+              </p>
+              <p className="font-semibold text-[var(--text-primary)]">What Changes for the Grower</p>
+              <p>
+                With AeroHive, orchard management shifts from reactive to predictive. After major weather events, drones can quickly reassess conditions.
+                AI compares new data against historical baselines to highlight emerging disease risk earlier than traditional methods. Rather than spraying
+                entire blocks, AeroHive generates precise treatment zones that guide aerial or ground equipment, reducing chemical use while improving
+                effectiveness. Over time, growers can see which areas repeatedly develop disease, which interventions reduced loss, and how canopy changes
+                relate to yield outcomes. This turns orchard management from guesswork into a measurable process.
+              </p>
+              <p className="font-semibold text-[var(--text-primary)]">Economic Impact</p>
+              <p>
+                The U.S. cherry industry is valued at approximately $19.7B across roughly 100,000 acres. Even within cherries alone, AeroHive’s pricing
+                model, reduced pesticide waste, and avoided yield loss represent a multi-million-dollar annual opportunity. For individual growers, the value
+                is clear: fewer missed disease outbreaks, lower input costs, better documentation of decisions, and stronger long-term orchard health.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

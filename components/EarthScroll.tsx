@@ -232,7 +232,7 @@ const layers: Layer[] = [
   {
     id: 2,
     title: "Above Canopy",
-    subtitle: "Crop Dusters",
+    subtitle: "Airplanes",
     altitude: "10 meters",
     icon: Plane,
     image: "/images/earth/cropduster.png",
